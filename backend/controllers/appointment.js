@@ -7,7 +7,7 @@ const users = require("../models/users");
 
 
 
-// ADD APPOINTMENT
+
 // ADD APPOINTMENT
 async function add(req, res) {
     const userId = req.user?.id;
@@ -694,6 +694,24 @@ async function completeAppointment(req, res) {
                 message: "Appointment not found!"
             }); 
         }
+        await notification.create({
+
+            recipientId: appoint.userId,
+
+            model: "users",
+
+            title: "Appointment Completed",
+
+            message:
+                "Your appointment has been completed successfully.",
+
+            type: "info",
+
+            appointmentId: appointmentId,
+
+            isRead: false
+
+        });
 
         return res.json({
             success: true,
@@ -822,6 +840,17 @@ async function doctorsDeleteAppointments(req,res) {
                 message:"appointment not found"
             });
         }
+        await notification.create({
+
+            recipientId: deleteAppointments.userId,
+            model: "users",
+            title: "Appointment Cancelled",
+            message: "Doctor cancelled your appointment.",
+            type: "rejected",
+            appointmentId: deleteAppointments._id,
+            isRead: false
+
+        });
 
         return res.json({
             success:true,

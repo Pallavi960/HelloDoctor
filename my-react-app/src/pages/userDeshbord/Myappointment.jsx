@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import logo from "../../assets/Hello_Doctor_logo.png";
 
 const Myappointment = () => {
 
@@ -21,7 +22,7 @@ const Myappointment = () => {
         "http://localhost:8000/user/user-appointment",
         {
           method: "GET",
-          credentials: "include"
+          credentials: "include",
         }
       );
 
@@ -58,16 +59,13 @@ const Myappointment = () => {
               `http://localhost:8000/user/getDoctorByid/${item.doctorId}`,
               {
                 method: "GET",
-                credentials: "include"
+                credentials: "include",
               }
             );
 
             const doctorResult = await doctorData.json();
 
             console.log("doctor api result:", doctorResult);
-
-            // IMPORTANT FIX
-            // YOUR API MAY RETURN getDoctor OR doctor INSTEAD OF data
 
             const doctorName =
               doctorResult?.data?.name ||
@@ -78,8 +76,7 @@ const Myappointment = () => {
             return {
 
               ...item,
-
-              doctorName: doctorName
+              doctorName: doctorName,
 
             };
 
@@ -92,8 +89,7 @@ const Myappointment = () => {
             return {
 
               ...item,
-
-              doctorName: "Unknown"
+              doctorName: "Unknown",
 
             };
 
@@ -135,24 +131,34 @@ const Myappointment = () => {
 
       {/* NAVBAR */}
 
-      <div className="flex flex-row items-center h-12 text-center shadow-lg bg-sky-500 justify-evenly text-amber-50">
+      <div className="flex flex-row items-center h-16 px-4 text-center shadow-lg bg-sky-400 justify-between text-amber-50">
 
-        <div className="m-2 text-2xl font-bold">
-          Hello Doctor
+        {/* LOGO */}
+
+        <div className="flex items-center gap-3 m-2">
+
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35 rounded-full"
+          />
+
         </div>
 
-        <div className="flex flex-row ml-auto space-x-6 font-bold">
+        {/* NAV LINKS */}
+
+        <div className="flex flex-row ml-auto space-x-4 font-bold">
 
           <Link
             to="/userDeshbord"
-            className="p-2 m-1 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
+            className="p-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 hover:rounded-2xl"
           >
             Home
           </Link>
 
           <Link
             to="/"
-            className="p-2 m-1 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
+            className="p-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 hover:rounded-2xl"
           >
             Profile
           </Link>
@@ -334,3 +340,4 @@ const Myappointment = () => {
 };
 
 export default Myappointment;
+``

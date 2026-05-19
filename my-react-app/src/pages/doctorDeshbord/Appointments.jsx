@@ -2,348 +2,562 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 
+// ================= IMPORT LOGO =================
+import logo from "../../assets/Hello_Doctor_logo.png";
+
 const Appointments = () => {
   const navigate = useNavigate();
 
-  const doctorId = "696b7709a7f15fd43c663b04"; // 👈 YOUR DOCTOR ID
-
   const [appointments, setAppointments] = useState([]);
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-
-  // ================= SLOT STATES =================
-  const [slots, setSlots] = useState([]);
-  const [selectedSlotId, setSelectedSlotId] = useState("");
-
-  const [form, setForm] = useState({
-    pationtName: "",
-    mobileNumber: "",
-    age: "",
-  });
+  const [loading, setLoading] = useState(false);
 
   // ================= FETCH APPOINTMENTS =================
   async function fetchAppointments(type) {
     try {
       setLoading(true);
-      setActiveTab(type);
-      setMessage("");
 
       let url = "";
 
       if (type === "pending") {
-        url = "http://localhost:8000/doctor/doctorsPendingAppointments";
+        url =
+          "http://localhost:8000/doctor/doctorsPendingAppointments";
       }
+
       if (type === "approved") {
-        url = "http://localhost:8000/doctor/doctorsApprovedAppointments";
+        url =
+          "http://localhost:8000/doctor/doctorsApprovedAppointments";
       }
+
       if (type === "completed") {
-        url = "http://localhost:8000/doctor/doctorsCompleteAppointments";
+        url =
+          "http://localhost:8000/doctor/doctorsCompleteAppointments";
       }
+
       if (type === "rejected") {
-        url = "http://localhost:8000/doctor/doctorsRejectAppointments";
+        url =
+          "http://localhost:8000/doctor/doctorsRejectAppointments";
       }
 
-      const response = await fetch(url, { credentials: "include" });
+      const response = await fetch(url, {
+        credentials: "include",
+      });
 
-      if (response.status === 401) return navigate("/doctor-login");
-      if (response.status === 403) return navigate("/");
+      if (response.status === 401) {
+        navigate("/doctor-login");
+        return;
+      }
 
       const data = await response.json();
 
-      if (!data.data || data.data.length === 0) {
-        setAppointments([]);
-        setMessage("No appointments found");
-      } else {
-        setAppointments(data.data);
-      }
+      const list =
+        data?.appointments ||
+        data?.allAppointments ||
+        data?.data ||
+        [];
+
+      setAppointments(list);
+
     } catch (error) {
+
       console.log(error);
-      setMessage("Something went wrong!");
+      setAppointments([]);
+
     } finally {
+
       setLoading(false);
-    }
-  }
 
-  // ================= FETCH SLOTS =================
-  async function fetchSlots() {
-    try {
-      const res = await fetch(
-        `http://localhost:8000/user/getDoctorSlots/${doctorId}`
-      );
-
-      const data = await res.json();
-
-      if (!data || data.length === 0) {
-        setSlots([]);
-      } else {
-        setSlots(data);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  // ================= OPEN MODAL =================
-  function openBookingModal(item) {
-    setSelectedAppointment(item);
-
-    setForm({
-      pationtName: "",
-      mobileNumber: "",
-      age: "",
-    });
-
-    setSelectedSlotId("");
-
-    fetchSlots(); // 👈 LOAD SLOTS WHEN OPENING
-  }
-
-  // ================= BOOK APPOINTMENT =================
-  async function bookAppointment() {
-    try {
-      const payload = {
-        doctorId,
-        slotId: selectedSlotId,
-        ...form,
-      };
-
-      const res = await fetch(
-        "http://localhost:8000/appointment/Book",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const data = await res.json();
-
-      alert(data.message);
-
-      setSelectedAppointment(null);
-      fetchAppointments(activeTab);
-    } catch (err) {
-      console.log(err);
     }
   }
 
   // ================= ACTIONS =================
-  async function approveAppointment(id) {
-    await fetch(`http://localhost:8000/doctor/accept/${id}`, {
-      method: "PUT",
-      credentials: "include",
-    });
+  async function handleAction(action, id) {
 
-    setSelectedAppointment(null);
-    fetchAppointments(activeTab);
+    try {
+
+      let url = "";
+      let method = "PUT";
+
+      if (action === "approve") {
+        url = `http://localhost:8000/doctor/accept/${id}`;
+      }
+
+      if (action === "reject") {
+        url = `http://localhost:8000/doctor/reject/${id}`;
+      }
+
+      if (action === "complete") {
+        url = `http://localhost:8000/doctor/complete/${id}`;
+      }
+
+      if (action === "delete") {
+        url = `http://localhost:8000/doctor/delete/${id}`;
+        method = "DELETE";
+      }
+
+      const response = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      alert(data.message || "Success");
+
+      fetchAppointments(activeTab);
+
+    } catch (error) {
+
+      console.log(error);
+      alert("Action failed");
+
+    }
   }
 
-  async function rejectAppointment(id) {
-    await fetch(`http://localhost:8000/doctor/reject/${id}`, {
-      method: "PUT",
-      credentials: "include",
-    });
+  // ================= STATUS COLORS =================
+  function statusStyle(status) {
 
-    setSelectedAppointment(null);
-    fetchAppointments(activeTab);
+    status = status?.toLowerCase();
+
+    if (status === "pending") {
+      return "bg-yellow-100 text-yellow-600";
+    }
+
+    if (status === "approved") {
+      return "bg-blue-100 text-blue-600";
+    }
+
+    if (status === "completed") {
+      return "bg-green-100 text-green-600";
+    }
+
+    if (status === "rejected") {
+      return "bg-red-100 text-red-600";
+    }
+
+    return "bg-gray-100 text-gray-600";
   }
 
-  async function completeAppointment(id) {
-    await fetch(`http://localhost:8000/doctor/complete/${id}`, {
-      method: "PUT",
-      credentials: "include",
-    });
+  // ================= ACTION MENU =================
+  function renderActions(status, id) {
 
-    fetchAppointments("approved");
+    status = status?.toLowerCase();
+
+    if (status === "pending") {
+
+      return (
+
+        <select
+          onChange={(e) =>
+            handleAction(e.target.value, id)
+          }
+          className="px-3 py-2 border rounded-xl outline-none"
+        >
+
+          <option value="">
+            Take Action
+          </option>
+
+          <option value="approve">
+            Approve
+          </option>
+
+          <option value="reject">
+            Reject
+          </option>
+
+          <option value="complete">
+            Complete
+          </option>
+
+          <option value="delete">
+            Delete
+          </option>
+
+        </select>
+
+      );
+    }
+
+    if (status === "approved") {
+
+      return (
+
+        <select
+          onChange={(e) =>
+            handleAction(e.target.value, id)
+          }
+          className="px-3 py-2 border rounded-xl outline-none"
+        >
+
+          <option value="">
+            Take Action
+          </option>
+
+          <option value="complete">
+            Complete
+          </option>
+
+          <option value="reject">
+            Reject
+          </option>
+
+          <option value="delete">
+            Delete
+          </option>
+
+        </select>
+
+      );
+    }
+
+    if (status === "rejected") {
+
+      return (
+
+        <select
+          onChange={(e) =>
+            handleAction(e.target.value, id)
+          }
+          className="px-3 py-2 border rounded-xl outline-none"
+        >
+
+          <option value="">
+            Take Action
+          </option>
+
+          <option value="approve">
+            Approve
+          </option>
+
+          <option value="delete">
+            Delete
+          </option>
+
+        </select>
+
+      );
+    }
+
+    if (status === "completed") {
+
+      return (
+
+        <button
+          onClick={() =>
+            handleAction("delete", id)
+          }
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition-all duration-300"
+        >
+          Delete
+        </button>
+
+      );
+    }
+
+    return null;
   }
 
-  async function deleteAppointment(id) {
-    await fetch(`http://localhost:8000/doctor/delete/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    fetchAppointments(activeTab);
-  }
-
+  // ================= LOAD =================
   useEffect(() => {
+
     fetchAppointments("pending");
+
   }, []);
 
-  function statusStyle(status) {
-    if (status === "pending") return "bg-orange-100 text-orange-600";
-    if (status === "approved") return "bg-blue-100 text-blue-600";
-    if (status === "completed") return "bg-green-100 text-green-600";
-    return "bg-red-100 text-red-600";
-  }
-
   return (
+
     <div className="min-h-screen bg-slate-100">
 
-      {/* ================= HEADER ================= */}
-      <div className="px-8 pt-8">
-        <h1 className="text-4xl font-bold">Appointments Management</h1>
-      </div>
+      {/* ================= NAVBAR ================= */}
 
-      {/* ================= TABLE ================= */}
-      <div className="p-8">
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+      <div className="flex items-center h-16 px-4 shadow-lg bg-sky-400 text-amber-50">
 
-          <table className="w-full">
-            <thead className="bg-sky-500 text-white">
-              <tr>
-                <th>Patient</th>
-                <th>Mobile</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+        <div className="flex items-center">
 
-            <tbody>
-              {appointments.map((item) => (
-                <tr key={item._id} className="text-center border-b">
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35"
+          />
 
-                  <td>{item.pationtName}</td>
-                  <td>{item.mobileNumber}</td>
-
-                  <td>{new Date(item.day).toLocaleDateString()}</td>
-
-                  <td>
-                    {new Date(item.start).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                    {" - "}
-                    {new Date(item.end).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </td>
-
-                  <td>
-                    <span className={statusStyle(item.status)}>
-                      {item.status}
-                    </span>
-                  </td>
-
-                  <td>
-                    <button
-                      onClick={() => openBookingModal(item)}
-                      className="bg-sky-500 text-white px-4 py-2 rounded-xl"
-                    >
-                      Action
-                    </button>
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
         </div>
+
+        {/* ================= NAV ITEMS ================= */}
+
+        <div className="flex items-center ml-auto space-x-5 font-bold">
+
+          <Link
+            to={"/Appontments"}
+            className="px-5 py-2 transition-all duration-300 bg-amber-50 text-sky-500 rounded-2xl"
+          >
+            Appointments
+          </Link>
+
+          <Link
+            to={"/add-slot"}
+            className="px-5 py-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
+          >
+            Add Time Slot
+          </Link>
+
+          <Link
+            to={"/notification"}
+            className="px-5 py-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
+          >
+            Notifications
+          </Link>
+
+          <Link
+            to={"/my-profile"}
+            className="transition-all duration-300 hover:text-sky-200"
+          >
+            <FaUserCircle size={40} />
+          </Link>
+
+        </div>
+
       </div>
 
-      {/* ================= MODAL ================= */}
-      {selectedAppointment && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+      {/* ================= MAIN ================= */}
 
-          <div className="bg-white w-[700px] p-6 rounded-2xl">
+      <div className="p-6">
 
-            <h2 className="text-2xl font-bold mb-4">
-              Book Appointment
-            </h2>
+        {/* HEADER */}
 
-            {/* ================= SLOTS ================= */}
-            <div className="mb-4">
-              <h3 className="font-bold mb-2">Available Slots</h3>
+        <div className="bg-white rounded-3xl shadow-md p-6 flex justify-between items-center">
 
-              {slots.length === 0 ? (
-                <p className="text-red-500">No slots available</p>
-              ) : (
-                <div className="grid gap-2 max-h-40 overflow-auto">
-                  {slots.map((slot) => (
-                    <button
-                      key={slot._id}
-                      disabled={slot.isBooked}
-                      onClick={() => setSelectedSlotId(slot._id)}
-                      className={`p-2 border rounded ${
-                        selectedSlotId === slot._id
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-100"
-                      }`}
-                    >
-                      {new Date(slot.start).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      {" - "}
-                      {new Date(slot.end).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      {slot.isBooked && " (Booked)"}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+          <div>
 
-            {/* ================= FORM ================= */}
-            <input
-              placeholder="Patient Name"
-              className="border p-2 w-full mb-2"
-              value={form.pationtName}
-              onChange={(e) =>
-                setForm({ ...form, pationtName: e.target.value })
-              }
-            />
+            <h1 className="text-3xl font-bold text-sky-500">
+              Appointments Management
+            </h1>
 
-            <input
-              placeholder="Mobile"
-              className="border p-2 w-full mb-2"
-              value={form.mobileNumber}
-              onChange={(e) =>
-                setForm({ ...form, mobileNumber: e.target.value })
-              }
-            />
-
-            <input
-              placeholder="Age"
-              className="border p-2 w-full mb-2"
-              value={form.age}
-              onChange={(e) =>
-                setForm({ ...form, age: e.target.value })
-              }
-            />
-
-            {/* ================= BUTTONS ================= */}
-            <div className="flex gap-2 mt-4">
-
-              <button
-                onClick={bookAppointment}
-                className="bg-green-500 text-white px-4 py-2 rounded-xl"
-              >
-                Book
-              </button>
-
-              <button
-                onClick={() => setSelectedAppointment(null)}
-                className="bg-gray-500 text-white px-4 py-2 rounded-xl"
-              >
-                Close
-              </button>
-
-            </div>
+            <p className="text-gray-500 mt-1">
+              Manage all patient appointments
+            </p>
 
           </div>
+
+          <div className="bg-sky-100 text-sky-600 px-5 py-2 rounded-xl font-bold">
+
+            {activeTab.toUpperCase()}
+
+          </div>
+
         </div>
-      )}
+
+        {/* ================= FILTER BUTTONS ================= */}
+
+        <div className="flex gap-4 mt-6 flex-wrap">
+
+          <button
+            onClick={() => {
+              setActiveTab("pending");
+              fetchAppointments("pending");
+            }}
+            className={`px-5 py-2 rounded-2xl font-semibold transition-all duration-300
+            ${
+              activeTab === "pending"
+                ? "bg-yellow-500 text-white"
+                : "bg-white text-yellow-500"
+            }`}
+          >
+            Pending
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab("approved");
+              fetchAppointments("approved");
+            }}
+            className={`px-5 py-2 rounded-2xl font-semibold transition-all duration-300
+            ${
+              activeTab === "approved"
+                ? "bg-blue-500 text-white"
+                : "bg-white text-blue-500"
+            }`}
+          >
+            Approved
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab("rejected");
+              fetchAppointments("rejected");
+            }}
+            className={`px-5 py-2 rounded-2xl font-semibold transition-all duration-300
+            ${
+              activeTab === "rejected"
+                ? "bg-red-500 text-white"
+                : "bg-white text-red-500"
+            }`}
+          >
+            Rejected
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveTab("completed");
+              fetchAppointments("completed");
+            }}
+            className={`px-5 py-2 rounded-2xl font-semibold transition-all duration-300
+            ${
+              activeTab === "completed"
+                ? "bg-green-500 text-white"
+                : "bg-white text-green-500"
+            }`}
+          >
+            Completed
+          </button>
+
+        </div>
+
+        {/* ================= TABLE ================= */}
+
+        <div className="bg-white rounded-3xl shadow-md mt-6 p-5 overflow-x-auto">
+
+          {loading ? (
+
+            <div className="py-20 text-center">
+
+              <p className="text-xl font-bold text-gray-500">
+                Loading...
+              </p>
+
+            </div>
+
+          ) : appointments.length === 0 ? (
+
+            <div className="py-24 text-center">
+
+              <p className="text-2xl font-extrabold text-gray-700">
+                No Appointments Found
+              </p>
+
+              <p className="text-sm text-gray-400 mt-2">
+                No {activeTab} appointments available
+              </p>
+
+            </div>
+
+          ) : (
+
+            <table className="w-full border-separate border-spacing-y-3">
+
+              <thead className="bg-sky-500 text-white">
+
+                <tr>
+
+                  <th className="py-4 rounded-l-2xl">
+                    Patient
+                  </th>
+
+                  <th>Mobile</th>
+
+                  <th>Age</th>
+
+                  <th>Date</th>
+
+                  <th>Time</th>
+
+                  <th>Status</th>
+
+                  <th className="rounded-r-2xl">
+                    Action
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {appointments.map((item, index) => (
+
+                  <tr
+                    key={item._id || index}
+                    className="bg-gray-50 hover:bg-sky-50 transition-all duration-300 text-center"
+                  >
+
+                    <td className="py-4 font-semibold rounded-l-2xl">
+                      {item.pationtName}
+                    </td>
+
+                    <td>
+                      {item.mobileNumber}
+                    </td>
+
+                    <td>
+                      {item.age}
+                    </td>
+
+                    <td>
+                      {new Date(
+                        item.day
+                      ).toLocaleDateString()}
+                    </td>
+
+                    <td>
+
+                      {new Date(
+                        item.start
+                      ).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+
+                      {" - "}
+
+                      {new Date(
+                        item.end
+                      ).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+
+                    </td>
+
+                    <td>
+
+                      <span
+                        className={`px-4 py-1 rounded-xl text-xs font-bold ${statusStyle(
+                          item.status
+                        )}`}
+                      >
+                        {item.status}
+                      </span>
+
+                    </td>
+
+                    <td className="rounded-r-2xl">
+
+                      {renderActions(
+                        item.status,
+                        item._id
+                      )}
+
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          )}
+
+        </div>
+
+      </div>
 
     </div>
+
   );
 };
 

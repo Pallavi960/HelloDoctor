@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import logo from "../../assets/Hello_Doctor_logo.png";
 const LoginDoctor = () => {
   const navigate = useNavigate();
 
@@ -40,22 +40,22 @@ const LoginDoctor = () => {
       <div className="flex w-full max-w-6xl bg-white rounded-3xl shadow-xl overflow-hidden">
 
         {/* ================= LEFT SIDE ================= */}
-        <div className="hidden md:flex flex-col justify-between w-1/2 p-12 text-white bg-gradient-to-br from-sky-400 via-blue-500 to-cyan-500">
+        <div className="hidden md:flex flex-col justify-between w-1/2 p-12  bg-gradient-to-br from-sky-400 via-blue-200 to-cyan-500">
 
           <div>
             <p className="text-sm opacity-90">Welcome to</p>
-            <h1 className="mt-4 text-4xl font-bold leading-tight">
-              Hello Doctor
-            </h1>
-            <p className="mt-6 text-lg opacity-95">
+             <img
+                src={logo}
+                alt="Hello Doctor Logo"
+                className="object-contain w-75 h-45 rounded-full"
+               />
+            <p className="mt-6 text-lg ">
               A smarter way to manage patients,
               appointments, and healthcare services.
             </p>
           </div>
 
-          <div className="text-sm opacity-80">
-            Secure • Fast • Reliable
-          </div>
+          
         </div>
 
         {/* ================= RIGHT SIDE ================= */}

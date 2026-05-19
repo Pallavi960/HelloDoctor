@@ -345,7 +345,6 @@ async function updateProfile(req, res) {
     try {
 
         const doctorId = req.user?.id;
-
         console.log("BODY:", req.body);
 
         // SAFE CHECK

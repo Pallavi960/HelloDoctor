@@ -64,10 +64,11 @@ notificationSchema.index(
   {
     expireAfterSeconds: 60 * 60 * 24 * 7,
     partialFilterExpression: {
-      readAt: { $exists: true },
+    readAt: { $type: "date" },
     },
   }
 );
+
 
 const notification = mongoose.model(
   "notification",

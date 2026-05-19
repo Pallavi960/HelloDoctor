@@ -1,97 +1,238 @@
-import React from 'react'
-import { useEffect } from 'react';
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaBell, FaUserCircle } from "react-icons/fa";
+
 const UserNotification = () => {
-    const [notificationData,setNotificationData]=useState([]);
-    const [doctorId,setDoctorId]=useState("");
-   
-    const [msg,setMsg]=useState("");
-   
-  
-    
-    async function collectData() {
-       
-       const id="69270bbb4c5c98421a6bc41b";
-        const res=await fetch(`http://localhost:8000/notification/serchForUser/${id}`);
-        // console.log("res",res);
-        const Ndata=await res.json();
-        setNotificationData(Ndata.data);
-        setDoctorId(Ndata.data.doctorId);
-        setMsg(Ndata.message);
-        console.log(msg);  
+  const [notifications, setNotifications] = useState([]);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // ================= FETCH NOTIFICATIONS =================
+  async function collectData() {
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        "http://localhost:8000/user/notificationUser",
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      console.log("notification data:", data);
+
+      if (!data.data || data.data.length === 0) {
+        setNotifications([]);
+        setMessage(data.message || "No notifications found");
+      } else {
+        setNotifications(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+      setMessage("Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    collectData();
+  }, []);
+
+  // ================= STATUS COLOR =================
+  function getTypeStyle(type) {
+    if (type === "approved") {
+      return "bg-blue-100 text-blue-600";
     }
 
-async function serchDoctorName() {
-  try{
-  const res=await fetch(`http://localhost:8000/doctor/getDoctorByid/${doctorId}`);
-  const getdata=res.json();
-  const name=getdata.data.name;
-  setDoctorName(name);
+    if (type === "info") {
+      return "bg-green-100 text-green-600";
+    }
+
+    if (type === "rejected") {
+      return "bg-red-100 text-red-600";
+    }
+
+    return "bg-yellow-100 text-yellow-600";
   }
-   catch(error)
-   {
-    alert("doctor name not found!");
-   }
-}
 
-
- 
-  
- useEffect(() => {
-     
-     collectData();
-   }, []);
   return (
-    <div>
-    <div className='flex flex-row items-center h-10 text-center bg-sky-500 justify-evenly text-amber-50'>
-       
-       <div className='m-2 text-2xl font-bold'>
-           Hello Doctor
+    <div className="min-h-screen bg-slate-100">
+
+      {/* ================= NAVBAR ================= */}
+
+      <div className="flex items-center h-14 px-6 shadow-md bg-sky-400 text-white">
+
+        <div className="text-2xl font-bold">
+          User Notifications
         </div>
-        <div className='flex flex-row ml-auto space-x-6 font-bold '>
-                <Link to={"/userDeshbord"} className='p-2 m-1 mask-3 hover:bg-amber-50 hover:text-indigo-600 hover:rounded-1xl '>Home</Link>
-                <Link to={"/"} className='p-2 m-1 mask-3 hover:bg-amber-50 hover:text-indigo-600 hover:rounded-1xl '>Profile</Link>
-        </div>    
-        <br />
-        
+
+        <div className="flex ml-auto space-x-5 font-bold">
+
+          <Link
+            to={"/userDeshbord"}
+            className="p-2 transition-all hover:bg-white hover:text-sky-500 rounded-xl"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to={"/my-profile"}
+            className="p-1 transition-all hover:text-sky-200"
+          >
+            <FaUserCircle size={34} />
+          </Link>
+
+        </div>
+
       </div>
-        <div className='flex justify-center mt-7'>
-        <table border={1} className='border-2 w-250 border-b-neutral-500 '>
-        <thead className=' bg-sky-500 border-amber-50 text-amber-50 rounded-2xl'>
-            <tr className='p-3 m-4'>
-                    <th className="px-4 py-3">Doctor NAME</th>
-                    <th className="px-4 py-3">Pationt name</th>
-                    <th className="px-4 py-3">info </th>
-                    <th className="px-4 py-3">status</th>
-           
-                    <th className="px-4 py-3">Edit appointment</th>
-            </tr>
-        </thead>
-        <tbody >
-      {/* BEFORE SEARCH */}
-     
 
-           {notificationData.length>0? (notificationData.map((d,index)=>(
-            <tr key={index} className='h-10 my-3 border boborder-b-stone-600 text-neutral-700 rounded-2xl placeholder="serach"'>
-                <td className='text-center'>{d.pationtName}</td>
-                <td className='text-center'>{d.age}</td>
-               
-                <td className='text-center'>{d.info}</td>
-                <td className='text-center'><button className='m-0 font-medium text-gray-400'>waiting for doctor approval</button></td>
-                <td className='text-center'><Link className='text-blue-700 underline'>edit</Link></td>
-            </tr>
-            
-           ))):(
-           <tr  className='text-center'>''
-            <td colSpan={5}  className='text-2xl text-gray-700'>notthing for you </td>
-           </tr>
-           )}
-        </tbody>
-        </table>
+      {/* ================= MAIN ================= */}
+
+      <div className="p-6">
+
+        {/* HEADER */}
+
+        <div className="bg-white rounded-3xl shadow-lg p-6 flex justify-between items-center">
+
+          <div className="flex items-center gap-4">
+
+            <div className="bg-sky-100 p-4 rounded-2xl">
+              <FaBell className="text-sky-500 text-2xl" />
+            </div>
+
+            <div>
+              <h1 className="text-3xl font-bold text-sky-500">
+                Notifications
+              </h1>
+
+              <p className="text-gray-500 text-sm mt-1">
+                Manage your appointment updates
+              </p>
+            </div>
+
+          </div>
+
+          <div className="bg-sky-100 text-sky-600 px-5 py-2 rounded-2xl font-bold">
+            Total : {notifications.length}
+          </div>
+
         </div>
-    </div>
-  )
-}
 
-export default UserNotification
+        {/* ================= NOTIFICATION LIST ================= */}
+
+        <div className="mt-6">
+
+          {loading ? (
+            <div className="bg-white rounded-3xl shadow-lg p-10 text-center">
+              <p className="text-2xl font-bold text-gray-600">
+                Loading...
+              </p>
+            </div>
+          ) : notifications.length > 0 ? (
+            <div className="space-y-5">
+
+              {notifications.map((item, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-3xl shadow-md p-5 border-l-[8px] border-sky-400"
+                >
+
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                    {/* LEFT */}
+
+                    <div>
+
+                      <div className="flex items-center gap-3">
+
+                        <h2 className="text-xl font-bold text-gray-700">
+                          {item.title}
+                        </h2>
+
+                        <span
+                          className={`px-3 py-1 rounded-xl text-xs font-bold capitalize ${getTypeStyle(
+                            item.type
+                          )}`}
+                        >
+                          {item.type}
+                        </span>
+
+                      </div>
+
+                      <p className="text-gray-600 mt-3 text-[16px]">
+                        {item.message}
+                      </p>
+
+                      <div className="mt-4 flex flex-wrap gap-5 text-sm text-gray-500">
+
+                        <span>
+                          Appointment ID :
+                          <span className="font-semibold text-gray-700 ml-1">
+                            {item.appointmentId}
+                          </span>
+                        </span>
+
+                        <span>
+                          Status :
+                          <span
+                            className={`ml-1 font-bold capitalize ${
+                              item.isRead
+                                ? "text-green-600"
+                                : "text-orange-500"
+                            }`}
+                          >
+                            {item.isRead ? "Read" : "Unread"}
+                          </span>
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                    {/* RIGHT */}
+
+                    <div className="text-sm text-gray-500 font-medium">
+
+                      {new Date(item.createdAt).toLocaleDateString()}
+
+                      <br />
+
+                      {new Date(item.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+
+                    </div>
+
+                  </div>
+
+                </div>
+              ))}
+
+            </div>
+          ) : (
+            <div className="bg-white rounded-3xl shadow-lg py-24 text-center">
+
+              <h1 className="text-3xl font-extrabold text-gray-700">
+                No Notifications Found
+              </h1>
+
+              <p className="text-gray-400 mt-3">
+                {message}
+              </p>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+};
+
+export default UserNotification;

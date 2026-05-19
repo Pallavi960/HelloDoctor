@@ -24,13 +24,15 @@ import MyProfile from './pages/doctorDeshbord/MyProfile'
 import AdminLogin from './pages/Admin/AdminLogin'
 import AllUsers from './pages/Admin/Allusers'
 import Allappointment from './pages/Admin/Allappointment'
+import Homepage from './pages/Homepage'
+import UserMyProfile from './pages/userDeshbord/UserMyProfile'
 function App() {
   
   return (
     <>  
       <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Role/>} />
+        <Route path='/' element={<Homepage/>} />
         <Route  path='/userDeshbord'  element={<User_Deshbord/>}/>
         <Route path='/doctor-login' element={<LoginDoctor/>}/>
         <Route path='/my-profile' element={<MyProfile/>}/>
@@ -52,7 +54,7 @@ function App() {
         <Route path='/allDoctors' element={<AllDoctors/>}/> 
         <Route path='/allusers' element={<AllUsers/>}/>
         <Route path='/allAppointments' element={<Allappointment/>}/>
-
+        <Route path='/user-my-profile' element={<UserMyProfile/>} />
 
       </Routes>
 

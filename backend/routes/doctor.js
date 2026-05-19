@@ -7,6 +7,7 @@ const {findPendingAppointments,findrejectAppointments,counPending,completedAppoi
     countComplete,doctorsPendingAppointments,doctorsCompleteAppointments,doctorsRejectAppointments, 
     doctorsDeleteAppointments,acceptAppointment,rejectAppointment,deleteAppointment,doctorsApprovedAppointments,completeAppointment}=require("../controllers/appointment");
 
+const{newNotificationDoctor}=require("../controllers/notification");
     
 const {auth,requireRole}=require("../middleware/auth");
 
@@ -48,6 +49,6 @@ doctorRoute.get("/count-pending",auth,requireRole("Doctor"),counPending);
 doctorRoute.get("/count-complete",auth,requireRole("Doctor"),countComplete);
 doctorRoute.get("/count-doctors",counDoctors);
 doctorRoute.put("/update-profile",auth,requireRole("Doctor"),updateProfile);
-
+doctorRoute.get("/notificationDoctor", auth,requireRole("Doctor"),newNotificationDoctor);
 
 module.exports = doctorRoute; 

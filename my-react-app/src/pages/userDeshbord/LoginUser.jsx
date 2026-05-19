@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "../../assets/Hello_Doctor_logo.png";
 
 const LoginUser = () => {
   const navigate = useNavigate();
@@ -41,23 +42,26 @@ const LoginUser = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-100 p-5">
+    <div className="flex items-center justify-center min-h-screen p-5 bg-slate-100">
 
-      {/* MAIN CONTAINER */}
+      <div className="flex w-full max-w-5xl overflow-hidden bg-white border shadow-2xl border-slate-200 rounded-3xl">
 
-      <div className="flex w-full max-w-5xl overflow-hidden bg-white border border-slate-200 shadow-2xl rounded-3xl">
+       
+        <div className="hidden md:flex flex-col justify-center w-1/2 bg-sky-500 text-white px-10 py-8">
 
-        {/* LEFT SIDE */}
+          <div className="flex flex-col items-center text-center">
 
-        <div className="hidden md:flex flex-col justify-center w-1/2 bg-sky-500 text-white p-12 relative">
+           
 
-          <div>
+            <img
+              src={logo}
+              alt="Hello Doctor Logo"
+              className="object-contain w-46 h-46 mb-1"
+            />
 
-            <h1 className="text-5xl font-bold leading-tight">
-              Hello Doctor
-            </h1>
+          
 
-            <p className="mt-6 text-lg leading-8 text-white/90">
+            <p className="text-base leading-7 text-white/90 max-w-sm">
 
               Welcome back to your healthcare platform.
               Manage appointments, connect with trusted doctors,
@@ -65,14 +69,16 @@ const LoginUser = () => {
 
             </p>
 
-            <div className="w-20 h-1 mt-8 bg-white rounded-full"></div>
+            {/* LINE */}
+
+            <div className="w-20 h-1 mt-4 bg-white rounded-full"></div>
 
             {/* IMAGE */}
 
             <img
               src="https://entranttechnologies.com/img/doctor_appointment_app_img.png"
               alt="doctor"
-              className="object-contain mt-10 rounded-2xl shadow-xl h-72"
+              className="object-contain h-64 mt-5 rounded-2xl shadow-xl"
             />
 
           </div>

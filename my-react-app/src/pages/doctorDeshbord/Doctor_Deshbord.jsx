@@ -4,7 +4,11 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { FaUserCircle } from "react-icons/fa";
 
+// ================= IMPORT LOGO =================
+import logo from "../../assets/Hello_Doctor_logo.png";
+
 const Doctor_Dashboard = () => {
+
   const navigate = useNavigate();
 
   const [doctorId, setDoctorId] = useState("");
@@ -13,41 +17,96 @@ const Doctor_Dashboard = () => {
   const [pendingC, setPendingC] = useState(0);
   const [completeC, setCompleteC] = useState(0);
 
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState(null);
+
+  // ================= CHECK ACCESS =================
 
   async function checkAccess() {
+
     try {
-      const info = await fetch(`http://localhost:8000/doctor/check`, {
-        method: "GET",
-        credentials: "include",
-      });
+
+      const info = await fetch(
+        `http://localhost:8000/doctor/check`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (info.status === 401) {
+
         navigate("/doctor-login");
         return;
+
       }
 
       if (info.status === 403) {
+
         navigate("/");
         return;
+
       }
 
       const result = await info.json();
 
       if (result.DoctorId.length === 0) {
+
         alert(result.message);
         navigate("/");
+
       }
 
       setDoctorId(result.DoctorId);
-    } catch (error) {
+
+    }
+
+    catch (error) {
+
       console.log(error);
       alert("Something went wrong");
+
     }
+
   }
 
-  async function handlePendingCount() {
+  // ================= LOGOUT =================
+
+  async function handleLogout() {
+
     try {
+
+      const info = await fetch(
+        "http://localhost:8000/doctor/logout",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const data = await info.json();
+
+      alert(data.message);
+
+      navigate("/doctor-login");
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+      alert("Logout failed");
+
+    }
+
+  }
+
+  // ================= PENDING COUNT =================
+
+  async function handlePendingCount() {
+
+    try {
+
       const info = await fetch(
         `http://localhost:8000/doctor/count-pending`,
         {
@@ -56,14 +115,25 @@ const Doctor_Dashboard = () => {
       );
 
       const data = await info.json();
+
       setPendingC(data.count);
-    } catch (error) {
-      console.log(error);
+
     }
+
+    catch (error) {
+
+      console.log(error);
+
+    }
+
   }
 
+  // ================= COMPLETE COUNT =================
+
   async function handleCompleteCount() {
+
     try {
+
       const info = await fetch(
         `http://localhost:8000/doctor/count-complete`,
         {
@@ -72,14 +142,25 @@ const Doctor_Dashboard = () => {
       );
 
       const data = await info.json();
+
       setCompleteC(data.count);
-    } catch (error) {
-      console.log(error);
+
     }
+
+    catch (error) {
+
+      console.log(error);
+
+    }
+
   }
 
+  // ================= PENDING APPOINTMENTS =================
+
   async function pendingAppointment() {
+
     try {
+
       const info = await fetch(
         `http://localhost:8000/doctor/doctorsPendingAppointments`,
         {
@@ -90,19 +171,33 @@ const Doctor_Dashboard = () => {
       const appointmentdata = await info.json();
 
       if (appointmentdata.data.length === 0) {
+
         setMessage(appointmentdata.message);
         setAppointment([]);
+
       } else {
+
         setAppointment(appointmentdata.data);
+
       }
-    } catch (error) {
+
+    }
+
+    catch (error) {
+
       console.log(error);
       setMessage("Something went wrong!");
+
     }
+
   }
 
+  // ================= APPROVE =================
+
   async function approveAppointment(id) {
+
     try {
+
       const info = await fetch(
         `http://localhost:8000/appointment/accept/${id}`,
         {
@@ -120,14 +215,24 @@ const Doctor_Dashboard = () => {
       handleCompleteCount();
 
       setSelectedAppointment(null);
-    } catch (error) {
+
+    }
+
+    catch (error) {
+
       console.log(error);
       alert("Error while approving appointment");
+
     }
+
   }
 
+  // ================= REJECT =================
+
   async function rejectAppointment(id) {
+
     try {
+
       const info = await fetch(
         `http://localhost:8000/appointment/reject/${id}`,
         {
@@ -145,36 +250,59 @@ const Doctor_Dashboard = () => {
       handleCompleteCount();
 
       setSelectedAppointment(null);
-    } catch (error) {
+
+    }
+
+    catch (error) {
+
       console.log(error);
       alert("Error while rejecting appointment");
+
     }
+
   }
 
+  // ================= LOAD =================
+
   useEffect(() => {
+
     checkAccess();
+
   }, []);
 
   useEffect(() => {
+
     if (!doctorId) return;
 
     handlePendingCount();
     handleCompleteCount();
     pendingAppointment();
+
   }, [doctorId]);
 
   return (
+
     <div className="min-h-screen bg-slate-100">
 
-      {/* Navbar */}
+      {/* ================= NAVBAR ================= */}
 
-      <div className="flex items-center h-14 px-6 shadow-md bg-sky-400 text-amber-50">
+      <div className="flex items-center h-16 px-4 shadow-lg bg-sky-400 text-amber-50">
 
-        <div className="text-2xl font-bold">
-          Hello Doctor
+        {/* ================= LOGO ================= */}
+
+        <div className="flex items-center">
+
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35 rounded-full"
+          />
+
         </div>
 
-        <div className="flex ml-auto space-x-5 font-bold">
+        {/* ================= NAV ITEMS ================= */}
+
+        <div className="flex items-center ml-auto space-x-5 font-bold">
 
           <Link
             to={"/Appontments"}
@@ -197,12 +325,12 @@ const Doctor_Dashboard = () => {
             Notifications
           </Link>
 
-          <Link
-            to={"/doctor-register"}
-            className="p-2 transition-all hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 transition-all bg-red-500 rounded-2xl hover:bg-red-600"
           >
-            Temp Register
-          </Link>
+            Logout
+          </button>
 
           <Link
             to={"/my-profile"}
@@ -215,19 +343,21 @@ const Doctor_Dashboard = () => {
 
       </div>
 
-      {/* Main */}
+      {/* ================= MAIN ================= */}
 
       <div className="p-5">
 
         <div className="flex flex-col gap-6 xl:flex-row">
 
-          {/* Left Side */}
+          {/* ================= LEFT SIDE ================= */}
 
           <div className="flex-1">
 
-            {/* Cards */}
+            {/* ================= CARDS ================= */}
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
+              {/* COMPLETE */}
 
               <div className="p-6 text-white shadow-2xl rounded-2xl bg-green-500">
 
@@ -241,6 +371,8 @@ const Doctor_Dashboard = () => {
 
               </div>
 
+              {/* PENDING */}
+
               <div className="p-6 text-white shadow-2xl rounded-2xl bg-orange-500">
 
                 <h2 className="text-2xl font-bold">
@@ -252,6 +384,8 @@ const Doctor_Dashboard = () => {
                 </p>
 
               </div>
+
+              {/* PATIENTS */}
 
               <div className="p-6 text-white shadow-2xl rounded-2xl bg-violet-500">
 
@@ -267,7 +401,7 @@ const Doctor_Dashboard = () => {
 
             </div>
 
-            {/* Pending Appointments */}
+            {/* ================= APPOINTMENTS ================= */}
 
             <div className="mt-10">
 
@@ -277,13 +411,16 @@ const Doctor_Dashboard = () => {
                   Pending Appointments
                 </h2>
 
-                <button className="px-4 py-2 font-bold text-white transition-all bg-sky-400 shadow-md rounded-2xl hover:bg-sky-500">
+                <Link
+                  to={"/Appontments"}
+                  className="px-4 py-2 font-bold text-white transition-all bg-sky-400 shadow-md rounded-2xl hover:bg-sky-500"
+                >
                   View All
-                </button>
+                </Link>
 
               </div>
 
-              {/* Table */}
+              {/* ================= TABLE ================= */}
 
               <div className="overflow-hidden bg-white shadow-2xl rounded-2xl">
 
@@ -292,11 +429,27 @@ const Doctor_Dashboard = () => {
                   <thead className="text-white bg-sky-400">
 
                     <tr>
-                      <th className="px-6 py-4">PATIENT</th>
-                      <th className="px-6 py-4">DATE</th>
-                      <th className="px-6 py-4">TIME</th>
-                      <th className="px-6 py-4">STATUS</th>
-                      <th className="px-6 py-4">ACTION</th>
+
+                      <th className="px-6 py-4">
+                        PATIENT
+                      </th>
+
+                      <th className="px-6 py-4">
+                        DATE
+                      </th>
+
+                      <th className="px-6 py-4">
+                        TIME
+                      </th>
+
+                      <th className="px-6 py-4">
+                        STATUS
+                      </th>
+
+                      <th className="px-6 py-4">
+                        ACTION
+                      </th>
+
                     </tr>
 
                   </thead>
@@ -319,28 +472,47 @@ const Doctor_Dashboard = () => {
                           </td>
 
                           <td className="font-semibold text-gray-700">
-                            {new Date(d.day).toLocaleDateString()}
+                            {new Date(
+                              d.day
+                            ).toLocaleDateString()}
                           </td>
 
                           <td className="font-semibold text-gray-700">
-                            {new Date(d.start).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+
+                            {new Date(
+                              d.start
+                            ).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+
                             {" - "}
-                            {new Date(d.end).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+
+                            {new Date(
+                              d.end
+                            ).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+
                           </td>
 
                           <td
                             className={`font-bold capitalize ${
-                              d.status === "completed"
+                              d.status ===
+                              "completed"
                                 ? "text-green-600"
-                                : d.status === "pending"
+                                : d.status ===
+                                  "pending"
                                 ? "text-orange-500"
-                                : d.status === "approved"
+                                : d.status ===
+                                  "approved"
                                 ? "text-blue-500"
                                 : "text-red-500"
                             }`}
@@ -349,14 +521,18 @@ const Doctor_Dashboard = () => {
                           </td>
 
                           <td>
+
                             <button
                               onClick={() =>
-                                setSelectedAppointment(d)
+                                setSelectedAppointment(
+                                  d
+                                )
                               }
                               className="px-4 py-2 font-bold text-white transition-all bg-sky-500 rounded-xl hover:bg-sky-600"
                             >
                               View
                             </button>
+
                           </td>
 
                         </tr>
@@ -384,13 +560,13 @@ const Doctor_Dashboard = () => {
 
           </div>
 
-          {/* Right Side */}
+          {/* ================= RIGHT SIDE ================= */}
 
           <div className="w-full xl:w-[320px]">
 
             <div className="sticky top-20">
 
-              {/* Calendar */}
+              {/* ================= CALENDAR ================= */}
 
               <div className="p-5 bg-white shadow-2xl rounded-2xl">
 
@@ -407,7 +583,7 @@ const Doctor_Dashboard = () => {
 
               </div>
 
-              {/* Schedule */}
+              {/* ================= SCHEDULE ================= */}
 
               <div className="p-5 mt-5 shadow-2xl rounded-2xl bg-sky-300">
 
@@ -416,11 +592,15 @@ const Doctor_Dashboard = () => {
                 </h2>
 
                 <p className="mt-3 font-semibold text-sky-950">
+
                   You currently have{" "}
+
                   <span className="font-black">
                     {pendingC}
                   </span>{" "}
+
                   pending appointments.
+
                 </p>
 
               </div>
@@ -433,9 +613,10 @@ const Doctor_Dashboard = () => {
 
       </div>
 
-      {/* Modal */}
+      {/* ================= MODAL ================= */}
 
       {selectedAppointment && (
+
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 
           <div className="w-[500px] p-6 bg-white shadow-2xl rounded-2xl">
@@ -511,11 +692,15 @@ const Doctor_Dashboard = () => {
 
             </div>
 
+            {/* ================= BUTTONS ================= */}
+
             <div className="flex justify-between mt-8">
 
               <button
                 onClick={() =>
-                  approveAppointment(selectedAppointment._id)
+                  approveAppointment(
+                    selectedAppointment._id
+                  )
                 }
                 className="px-6 py-2 font-bold text-white transition-all bg-green-500 rounded-xl hover:bg-green-600"
               >
@@ -524,7 +709,9 @@ const Doctor_Dashboard = () => {
 
               <button
                 onClick={() =>
-                  rejectAppointment(selectedAppointment._id)
+                  rejectAppointment(
+                    selectedAppointment._id
+                  )
                 }
                 className="px-6 py-2 font-bold text-white transition-all bg-red-500 rounded-xl hover:bg-red-600"
               >
@@ -549,6 +736,7 @@ const Doctor_Dashboard = () => {
 
     </div>
   );
+
 };
 
 export default Doctor_Dashboard;

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+// import your logo
+import logo from "../../assets/Hello_Doctor_logo.png"; // change path if needed
+
 const User_Deshbord = () => {
 
   const navigate = useNavigate();
@@ -41,6 +44,35 @@ const User_Deshbord = () => {
 
   }
 
+  // ================= LOGOUT =================
+
+  async function handleLogout() {
+
+    try {
+
+      const res = await fetch(
+        "http://localhost:8000/user/logout",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      alert(data.message);
+
+      navigate("/user-login");
+
+    } catch (error) {
+
+      console.log(error);
+      alert("Logout failed!");
+
+    }
+
+  }
+
   useEffect(() => {
     collectData();
   }, []);
@@ -51,10 +83,22 @@ const User_Deshbord = () => {
 
       {/* NAVBAR */}
 
-      <div className="flex flex-row items-center h-14 px-4 text-center shadow-lg bg-sky-400 justify-evenly text-amber-50">
+      <div className="flex flex-row items-center h-16 px-4 text-center shadow-lg bg-sky-400 justify-evenly text-amber-50">
 
-        <div className="m-2 text-3xl font-bold tracking-wide">
-          Hello Doctor
+        {/* LOGO */}
+
+        <div className="flex items-center gap-3 m-2">
+
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35 rounded-full"
+          />
+
+          {/* <h1 className="text-3xl font-bold tracking-wide">
+           
+          </h1> */}
+
         </div>
 
         <div className="flex flex-row ml-auto space-x-4 font-bold">
@@ -81,25 +125,18 @@ const User_Deshbord = () => {
           </Link>
 
           <Link
-            to={"/user-login"}
-            className="p-2 transition-all duration-300 hover:text-sky-500 hover:bg-amber-50 hover:rounded-2xl"
-          >
-            Login
-          </Link>
-
-          <Link
-            to={"/"}
-            className="p-2 px-4 transition-all duration-300 bg-red-500 rounded-2xl hover:bg-red-400"
-          >
-            Logout
-          </Link>
-
-          <Link
-            to={"/user-register"}
+            to={"/user-my-profile"}
             className="p-2 transition-all duration-300 hover:text-sky-500 hover:bg-amber-50 hover:rounded-2xl"
           >
             Profile
           </Link>
+
+          <button
+            onClick={handleLogout}
+            className="p-2 px-4 transition-all duration-300 bg-red-500 rounded-2xl hover:bg-red-400"
+          >
+            Logout
+          </button>
 
         </div>
 
@@ -245,11 +282,19 @@ const User_Deshbord = () => {
 
           <div className="max-w-md">
 
-            <h1 className="text-4xl font-bold text-sky-600">
-              Hello Doctor
-            </h1>
+            <div className="flex items-center gap-1">
 
-            <p className="mt-5 text-[16px] leading-8 text-gray-700">
+              <img
+                src={logo}
+                alt="logo"
+                className="w-50 h-50"
+              />
+
+              
+
+            </div>
+
+            <p className="mt-3 text-[16px]  text-gray-700">
 
               Hello Doctor helps patients connect with experienced doctors,
               book appointments easily, and manage healthcare services

@@ -1,242 +1,219 @@
-const { findById } = require("../models/doctor");
-const users=require("../models/users");
-const notification=require("../models/notification");
-const appointment=require("../models/appointment");
+const notification = require("../models/notification");
 
 
-async function newNotificationUser(req,res) {
-    const userid=req.user?.id;
-    try{
-        const notifyUser=await notification.find({ recipientId: userid});
-        if(notifyUser.length===0)
-        {
-            return res.json({
-                message:"no notification find for you!",
-                data:[]
+// =========================================
+// GET USER NOTIFICATIONS
+// =========================================
+async function newNotificationUser(req, res) {
+
+    const userId = req.user?.id;
+
+    try {
+
+        // fetch all user notifications
+        const notifyUser = await notification
+            .find({
+
+                recipientId: userId,
+
+                model: "users"
+
             })
-        }
-        return res.json(
-            {
-                message:"all notifications",
-                data:notifyUser
-            }
-        )
-    }
-    catch(error)
-    {
-      return res.json(
-            {
-                message:"something wents wrong!",
-                data:[]
-            }
-        )
-    }  
-}
+            .sort({ createdAt: -1 });
 
-async function newNotificationDoctor(req,res) {
-    const doctorid=req.user?.id;
-    try{
-        const notifydoctor=await notification.find({ recipientId: doctorid});
-        if(notifydoctor.length===0)
-        {
+        // no notifications found
+        if (notifyUser.length === 0) {
+
             return res.json({
-                message:"no notification find for you!",
-                data:[]
+
+                success: true,
+
+                message: "No notifications found!",
+
+                data: []
+
+            });
+
+        }
+
+        return res.json({
+
+            success: true,
+
+            message: "All notifications fetched successfully!",
+
+            data: notifyUser
+
+        });
+
+    }
+    catch (error) {
+
+        console.log(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Something went wrong!",
+
+            data: []
+
+        });
+
+    }
+
+}
+
+
+
+// =========================================
+// GET DOCTOR NOTIFICATIONS
+// =========================================
+async function newNotificationDoctor(req, res) {
+
+    const doctorId = req.user?.id;
+
+    try {
+
+        // fetch all doctor notifications
+        const notifyDoctor = await notification
+            .find({
+
+                recipientId: doctorId,
+
+                model: "doctors"
+
             })
+            .sort({ createdAt: -1 });
+
+        // no notifications found
+        if (notifyDoctor.length === 0) {
+
+            return res.json({
+
+                success: true,
+
+                message: "No notifications found!",
+
+                data: []
+
+            });
+
         }
-        return res.json(
-            {
-                message:"all notifications",
-                data:notifydoctor
-            }
-        )
+
+        return res.json({
+
+            success: true,
+
+            message: "All notifications fetched successfully!",
+
+            data: notifyDoctor
+
+        });
+
     }
-    catch(error)
-    {
-      return res.json(
-            {
-                message:"something wents wrong!",
-                data:[]
-            }
-        )
-    }  
-    
+    catch (error) {
+
+        console.log(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Something went wrong!",
+
+            data: []
+
+        });
+
+    }
+
 }
 
 
 
+// =========================================
+// MARK NOTIFICATION AS READ
+// =========================================
+async function markAsRead(req, res) {
 
+    try {
 
+        const notificationId = req.params.id;
 
+        // update notification
+        const updateNotification =
+            await notification.findByIdAndUpdate(
 
+                notificationId,
 
+                {
 
+                    // mark notification as read
+                    isRead: true,
 
+                    // save read time
+                    readAt: new Date()
 
+                },
 
+                {
 
+                    new: true
 
+                }
 
+            );
 
+        // notification not found
+        if (!updateNotification) {
 
+            return res.json({
 
+                success: false,
 
+                message: "Notification not found!"
 
+            });
 
-
-
-
-
-
-
-
-
-
-
-
-// async function add(req,res) {
-//     const userId=req.user?.id;
-//     const data=req.body;
-//     if(!data)
-//     {
-//         return res.json({message:"error to ge the data!"});
-//     }
-//     const {doctorId,pationtName,mobileNumber,age,info}=req.body;
-//     if(! mobileNumber||!info)
-//     {
-//         console.log( mobileNumber);
-//         console.log(info);
-//         return res.json({message:"All information must be required!"});
-//     }
-//     try{
-//         await notification.create(
-//             {doctorId,userId,pationtName,mobileNumber,age,info}
-//         )
-//         return res.json({message:"request send successfully!"});
-//     }
-//     catch(error)
-//     {
-//         return res.json({message:"soemthing went wrong!"});
-//     }   
-// }
-
-
-async function serchForDoctor(req,res) {
-   const id=req.params.id;
-   console.log("doctor id",id);
-   if(!id)
-   {
-     return res.json({message:"error to get id!"});
-   }
-   try{
-       const doctor=await notification.find({doctorId:id});
-       console.log(doctor);
-       if(!doctor)
-       {
-        console.log(doctor);
-        return res.json({
-                    message:"notthing find for you!",
-                    data: []
-                });
-       }
-       return res.json({
-        message:"get this for you!",
-        data:doctor
-       });
-   }
-   catch(error)
-   {
-    return res.json({
-        message:"something wents wronng!",
-        data:[]
-    })
-   }   
-}
-
-async function serchForUser(req,res) {
-   const id=req.user?.id;
-   console.log("user id",id);
-   if(!id)
-   {
-     return res.json({message:"error to get id!"});
-   }
-   try{
-       const user=await notification.find({userId:id});
-       console.log(user);
-
-       if(!user)
-       {
-        console.log(user);
-        return res.json({
-                    message:"notthing find for you!",
-                    data: []
-                });
-       }
-       return res.json({
-        message:"get this for you!",
-        data:user
-       });
-   }
-   catch(error)
-   {
-    return res.json({
-        message:"something wents wronng!",
-        data:[]
-    })
-   }   
-}
-
-async function handleAccepct(req,res) {
-    const id=req.params.id;
-    console.log(id);
-    try{
-        const getNotification=await notification.findById(id);
-        if(!getNotification)
-        {
-            return res.json({message:"error to get notification!"});
         }
-      
-        const [dayPart,timePart]=getNotification.info.split(":");
-        const dayP=dayPart.trim();
-        const[startTime,endTime]=timePart.split("to");
-        const startP=startTime.trim();
-        const endP=endTime.trim();
-        const newApp=await appointment.create(
-            {
-                doctorId: getNotification.doctorId,
-                userId:getNotification.userId,
-                day:dayP,
-                start:startP,
-                end:endP
-            }
-        )
-       
-       const result= await notification.findByIdAndDelete(id);
-       if(!result)
-       {
-        console.log("deletion operation perform successfully!");
-       }
-       return res.json({message:"request accepcted"})
+
+        return res.json({
+
+            success: true,
+
+            message: "Notification marked as read!",
+
+            data: updateNotification
+
+        });
 
     }
-    catch(error)
-    {
-        return res.json({message:"something wents wrong!"});
+    catch (error) {
+
+        console.log(error);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Something went wrong!"
+
+        });
+
     }
 
-    
 }
 
 
 
+module.exports = {
 
-
-module.exports={
-    // add,
-    serchForDoctor,
-    serchForUser,
-    handleAccepct,
     newNotificationUser,
-    newNotificationDoctor
-}
 
+    newNotificationDoctor,
+
+    markAsRead
+
+};

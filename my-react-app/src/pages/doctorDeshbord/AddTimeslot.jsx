@@ -1,41 +1,105 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaClock, FaArrowLeft } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaClock,
+  FaArrowLeft,
+  FaUserCircle,
+  FaSignOutAlt,
+} from "react-icons/fa";
+
+// ================= IMPORT LOGO =================
+import logo from "../../assets/Hello_Doctor_logo.png";
 
 const AddTimeslot = () => {
+
+  const navigate = useNavigate();
+
   const [day, setDay] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
 
   function addDay(e) {
+
     setDay(e.target.value);
+
   }
 
   function addStart(e) {
+
     setStart(e.target.value);
+
   }
 
   function addEnd(e) {
+
     setEnd(e.target.value);
+
   }
 
+  // ================= LOGOUT =================
+
+  async function handleLogout() {
+
+    try {
+
+      const res = await fetch(
+        "http://localhost:8000/doctor/logout",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      alert(data.message);
+
+      navigate("/doctor-login");
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+
+      alert("Logout failed");
+
+    }
+
+  }
+
+  // ================= ADD SLOT =================
+
   async function HandleSubmit(e) {
+
     e.preventDefault();
 
     if (!day || !start || !end) {
+
       alert("All fields are required!");
+
       return;
+
     }
 
     try {
+
       const data = { day, start, end };
 
-      const res = await fetch("http://localhost:8000/doctor/add-slot", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
+      const res = await fetch(
+        "http://localhost:8000/doctor/add-slot",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify(data),
+
+          credentials: "include",
+        }
+      );
 
       const resData = await res.json();
 
@@ -44,61 +108,124 @@ const AddTimeslot = () => {
       setDay("");
       setStart("");
       setEnd("");
-    } catch (error) {
-      alert("Something went wrong!");
+
     }
+
+    catch (error) {
+
+      console.log(error);
+
+      alert("Something went wrong!");
+
+    }
+
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-sky-100">
-      {/* Navbar */}
-      <div className="flex items-center h-14 px-6 text-white shadow-lg bg-gradient-to-r from-sky-500 to-blue-600">
-        <div className="text-2xl font-bold tracking-wide">
-          Hello Doctor
+
+    <div className="min-h-screen bg-slate-100">
+
+      {/* ================= NAVBAR ================= */}
+
+      <div className="flex items-center h-16 px-4 shadow-lg bg-sky-400 text-amber-50">
+
+        {/* ================= LOGO ================= */}
+
+        <div className="flex items-center">
+
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35 rounded-full"
+          />
+
         </div>
 
-        <div className="flex ml-auto space-x-4 text-sm font-medium">
+        {/* ================= NAV ITEMS ================= */}
+
+        <div className="flex items-center ml-auto space-x-5 font-bold">
+
           <Link
             to={"/doctorDeshbord"}
-            className="px-4 py-2 transition-all duration-300 hover:bg-white hover:text-sky-600 rounded-xl"
+            className="p-2 transition-all hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
           >
             Dashboard
           </Link>
 
           <Link
-            to={"/"}
-            className="px-4 py-2 transition-all duration-300 hover:bg-white hover:text-sky-600 rounded-xl"
+            to={"/Appontments"}
+            className="p-2 transition-all hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
           >
-            Profile
+            Appointments
           </Link>
+
+         
+
+          <Link
+            to={"/notification"}
+            className="p-2 transition-all hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
+          >
+            Notifications
+          </Link>
+
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 transition-all bg-red-500 rounded-2xl hover:bg-red-600"
+          >
+            Logout
+          </button>
+
+          <Link
+            to={"/my-profile"}
+            className="p-1 transition-all hover:text-sky-500"
+          >
+            <FaUserCircle size={36} />
+          </Link>
+
         </div>
+
       </div>
 
-      {/* Main */}
+      {/* ================= MAIN ================= */}
+
       <div className="flex items-center justify-center px-4 py-12">
-        <form onSubmit={HandleSubmit} className="w-full max-w-3xl">
-          {/* Increased Width Here */}
-          <div className="w-full p-10 border shadow-2xl bg-white/80 backdrop-blur-lg rounded-[35px] border-white/30">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="flex items-center justify-center w-14 h-14 text-white shadow-lg rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600">
-                <FaClock className="text-2xl" />
+
+        <form
+          onSubmit={HandleSubmit}
+          className="w-full max-w-3xl"
+        >
+
+          <div className="w-full p-10 bg-white shadow-2xl rounded-[35px]">
+
+            {/* ================= HEADER ================= */}
+
+            <div className="flex items-center gap-4 mb-10">
+
+              <div className="flex items-center justify-center w-16 h-16 text-white rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg">
+
+                <FaClock className="text-3xl" />
+
               </div>
 
               <div>
-                <h1 className="text-3xl font-black text-slate-700">
+
+                <h1 className="text-4xl font-black text-slate-700">
                   Add Time Slot
                 </h1>
 
-                <p className="text-sm text-slate-500">
-                  Create your available schedule
+                <p className="mt-1 text-slate-500">
+                  Create your available appointment schedule
                 </p>
+
               </div>
+
             </div>
 
-            {/* Date */}
-            <div className="mb-5">
-              <label className="block mb-2 font-semibold text-slate-700">
+            {/* ================= DATE ================= */}
+
+            <div className="mb-6">
+
+              <label className="block mb-3 text-lg font-bold text-slate-700">
                 Select Date
               </label>
 
@@ -106,13 +233,16 @@ const AddTimeslot = () => {
                 type="date"
                 value={day}
                 onChange={addDay}
-                className="w-full px-4 py-3 border bg-slate-50 border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-200"
+                className="w-full px-5 py-4 text-lg border-2 border-slate-200 rounded-2xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
               />
+
             </div>
 
-            {/* Start */}
-            <div className="mb-5">
-              <label className="block mb-2 font-semibold text-slate-700">
+            {/* ================= START TIME ================= */}
+
+            <div className="mb-6">
+
+              <label className="block mb-3 text-lg font-bold text-slate-700">
                 Start Time
               </label>
 
@@ -120,13 +250,16 @@ const AddTimeslot = () => {
                 type="time"
                 value={start}
                 onChange={addStart}
-                className="w-full px-4 py-3 border bg-slate-50 border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-200"
+                className="w-full px-5 py-4 text-lg border-2 border-slate-200 rounded-2xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
               />
+
             </div>
 
-            {/* End */}
-            <div className="mb-8">
-              <label className="block mb-2 font-semibold text-slate-700">
+            {/* ================= END TIME ================= */}
+
+            <div className="mb-10">
+
+              <label className="block mb-3 text-lg font-bold text-slate-700">
                 End Time
               </label>
 
@@ -134,32 +267,45 @@ const AddTimeslot = () => {
                 type="time"
                 value={end}
                 onChange={addEnd}
-                className="w-full px-4 py-3 border bg-slate-50 border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sky-200"
+                className="w-full px-5 py-4 text-lg border-2 border-slate-200 rounded-2xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
               />
+
             </div>
 
-            {/* Buttons */}
+            {/* ================= BUTTONS ================= */}
+
             <div className="flex gap-4">
+
               <Link
                 to={"/doctorDeshbord"}
-                className="flex items-center justify-center w-1/3 gap-2 py-3 font-semibold border border-slate-300 rounded-2xl text-slate-600 hover:bg-slate-100"
+                className="flex items-center justify-center gap-2 w-1/3 py-4 font-bold border-2 border-slate-300 rounded-2xl text-slate-700 hover:bg-slate-100 transition-all"
               >
+
                 <FaArrowLeft />
+
                 Back
+
               </Link>
 
               <button
                 type="submit"
-                className="w-2/3 py-3 font-bold text-white shadow-lg rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:scale-105"
+                className="w-2/3 py-4 text-lg font-black text-white transition-all duration-300 shadow-xl rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:scale-[1.02]"
               >
                 Add Slot
               </button>
+
             </div>
+
           </div>
+
         </form>
+
       </div>
+
     </div>
+
   );
+
 };
 
 export default AddTimeslot;

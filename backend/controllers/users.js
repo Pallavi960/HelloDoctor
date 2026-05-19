@@ -167,6 +167,81 @@ async function getUserById(req,res) {
     }       
 }
 
+async function myprofile(req,res) {
+    try{
+        const getUserID = req.user?.id;
+        const getUser = await users.findById(getUserID);
+        // console.log("user id is:",getUser);
+        if (!getUser) {
+            return res.status(404).json({
+              message: "User not found!",
+              data: null
+            });
+          }
+
+          return res.json({
+            message: "User data fetched successfully!",
+            data: getUser
+          });
+    }
+    catch(error)
+    {
+        return res.status(500).json({
+            message: "Something went wrong!",
+            error: error.message
+        });
+    }
+
+}
+
+async function updateUserProfile(req, res) {
+
+    try {
+
+        const userId = req.user?.id;
+
+        const { password } = req.body;
+
+        const findUser = await users.findById(userId);
+
+        if (!findUser) {
+
+            return res.json({
+                success: false,
+                message: "User not found!"
+            });
+
+        }
+
+
+        if (password) {
+
+            findUser.password = password;
+
+        }
+
+
+        await findUser.save();
+
+        return res.json({
+            success: true,
+            message: "Profile updated successfully!"
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(error);
+
+        return res.json({
+            success: false,
+            message: "Something went wrong!"
+        });
+
+    }
+
+}
 
 
 
@@ -178,5 +253,6 @@ module.exports={
     logout,
     countUsers,
     getUserById,
-    
+    myprofile,
+    updateUserProfile
 }

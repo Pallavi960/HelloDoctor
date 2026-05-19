@@ -1,215 +1,615 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaUserCircle,
+  FaBell,
+  FaClipboardList,
+  FaSignOutAlt,
+} from "react-icons/fa";
 
+// ================= IMPORT LOGO =================
+import logo from "../../assets/Hello_Doctor_logo.png";
 
+const Notification = () => {
 
-const Notification_user = () => {
-  
-const[notification,setNotification]=useState([]);
-const[message,setMessage]=useState("");
-const[selectAppoint,setSelectAppoint]=useState(null);
+  const navigate = useNavigate();
 
+  const [notification, setNotification] = useState([]);
+  const [message, setMessage] = useState("");
+  const [selectAppoint, setSelectAppoint] = useState(null);
 
+  // ================= LOGOUT =================
 
+  async function handleLogout() {
 
-async function handleAccepct(id) {
-  try{
-    const res=await fetch(`http://localhost:8000/appointment/accept/${id}`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    notification.isRead=true;
-    const ress=await res.json();
-    alert(ress.message);
-    console.log(ress);
-    console.log(selectAppoint);
-  }
-  catch(error)
-  {
-    alert("something wents wrong!",error);
-    return;
-  }
-}
+    try {
 
-
-async function handleReject(id) {
-  try{
-    const res=await fetch(`http://localhost:8000/appointment/reject/${id}`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    const ress=await res.json();
-    alert(ress.message);
-    console.log(ress);
-
-  }
-  catch(error)
-  {
-    alert("something wents wrong!",error);
-    return;
-  }
-}
-
-
-async  function collectData()
-{
-  try{
-     const res = await fetch("http://localhost:8000/notification/doctorNotification", {
-            method: "GET",
-            credentials: "include"  
-        });
-        const result=await res.json();
-        if(result.data.length===0 || !result.data)
+      const res = await fetch(
+        "http://localhost:8000/doctor/logout",
         {
-          setNotification([]);
-          setMessage(result.message);
-        
+          method: "GET",
+          credentials: "include",
         }
-        else{
-          setMessage(result.message);
-          console.log(result.data);
+      );
 
-    const appointmentWithdetails=await Promise.all(
-        result.data.map(async(item)=>
+      const data = await res.json();
+
+      alert(data.message);
+
+      navigate("/doctor-login");
+
+    } catch (error) {
+
+      console.log(error);
+      alert("Logout failed");
+
+    }
+
+  }
+
+  // ================= ACCEPT =================
+
+  async function handleAccept(id) {
+
+    try {
+
+      const res = await fetch(
+        `http://localhost:8000/appointment/accept/${id}`,
         {
-            try{    
-            const appointId=item.appointmentId;
-            const appointRes=await fetch(`http://localhost:8000/appointment/getAppointmentByid/${appointId}`,
-              {credentials:"include"}
-            );
-            const details=await appointRes.json();
+          method: "PUT",
+          credentials: "include",
+        }
+      );
 
-            return {
+      const data = await res.json();
+
+      alert(data.message);
+
+      collectData();
+
+      setSelectAppoint(null);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Something went wrong!");
+
+    }
+
+  }
+
+  // ================= REJECT =================
+
+  async function handleReject(id) {
+
+    try {
+
+      const res = await fetch(
+        `http://localhost:8000/appointment/reject/${id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      alert(data.message);
+
+      collectData();
+
+      setSelectAppoint(null);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Something went wrong!");
+
+    }
+
+  }
+
+  // ================= FETCH NOTIFICATIONS =================
+
+  async function collectData() {
+
+    try {
+
+      const res = await fetch(
+        "http://localhost:8000/doctor/notificationDoctor",
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const result = await res.json();
+
+      console.log("notification result:", result);
+
+      if (!result.data || result.data.length === 0) {
+
+        setNotification([]);
+
+        setMessage(result.message);
+
+      } else {
+
+        const appointmentWithDetails = await Promise.all(
+          result.data.map(async (item) => {
+
+            try {
+
+              const appointId = item.appointmentId;
+
+              const appointRes = await fetch(
+                `http://localhost:8000/appointment/getAppointmentByid/${appointId}`,
+                {
+                  credentials: "include",
+                }
+              );
+
+              const details = await appointRes.json();
+
+              return {
                 ...item,
-                appointment: details.data
+                appointment: details.data,
+              };
+
+            } catch (error) {
+
+              return {
+                ...item,
+                appointment: null,
+              };
 
             }
-             }
-             catch(error)
-             {
-                return{
-                    ...item,
-                     appointment:null
-                }
-                
-             }  
-        })
-    ) 
-    
-    console.log("appointment with the details",appointmentWithdetails);
-    setNotification(appointmentWithdetails);
+
+          })
+        );
+
+        setNotification(appointmentWithDetails);
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+      setMessage("Something went wrong!");
 
     }
-    }
-    catch(error)
-    {
-        console.log("something wents wrong!",error);
-    } 
-}
-  useEffect(()=>
-  {
+
+  }
+
+  useEffect(() => {
+
     collectData();
-  },[]);
-  
+
+  }, []);
+
+  // ================= STATUS STYLE =================
+
+  function statusStyle(status) {
+
+    if (status === "approved") {
+      return "bg-green-500";
+    }
+
+    if (status === "rejected") {
+      return "bg-red-500";
+    }
+
+    if (status === "completed") {
+      return "bg-blue-500";
+    }
+
+    return "bg-orange-500";
+
+  }
+
   return (
-       <div>
-         <div className='flex flex-row items-center h-12 text-center bg-sky-500 justify-evenly text-amber-50'>
+
+    <div className="min-h-screen bg-slate-100">
+
+      {/* ================= NAVBAR ================= */}
+
+      <div className="flex items-center h-16 px-4 shadow-lg bg-sky-400 text-amber-50">
+
+        {/* ================= LOGO ================= */}
+
+        <div className="flex items-center">
+
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35 rounded-full"
+          />
+
+        </div>
+
+        {/* ================= NAV ITEMS ================= */}
+
+        <div className="flex items-center ml-auto space-x-5 font-bold ">
+
+          <Link
+            to={"/doctorDeshbord"}
+            className="px-5 py-3 transition-all duration-300 hover:bg-white hover:text-sky-500 rounded-2xl"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to={"/Appontments"}
+            className="flex items-center gap-2 px-5 py-3 transition-all duration-300 hover:bg-white hover:text-sky-500 rounded-2xl"
+          >
+           
+            Appointments
+          </Link>
+
          
-           <div className='m-2 text-2xl font-bold'>
-              Hello Doctor
-           </div>
-           <div className='flex flex-row ml-auto space-x-6 font-bold '>
-               
-                  <Link to={"/userDeshbord"} className='p-2 m-1 mask-3 hover:bg-amber-50 hover:text-sky-500 hover:rounded-1xl hover:rounded-2xl '>Home</Link>
-                  <Link to={"/notification-user"} className='p-2 m-1 mask-3 hover:text-sky-500 hover:rounded-1xl hover:bg-amber-50 hover:rounded-2xl '>Profile</Link>
 
-           </div>
-           <br/>
-         </div>
-         <div className='flex flex-col justify-center items-center'>
-              <div className='w-5xl mt-5'>
-               {
-               notification.map((t, index) => (
-              <div
-                  key={index}
-                  className="w-full max-w-4xl bg-white rounded-2xl shadow-md hover:shadow-lg transition p-5 mb-4 flex justify-between items-center">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-5 py-3 transition-all duration-300 hover:bg-red-400 rounded-2xl bg-red-500"
+          >
+            Logout
+          </button>
 
-                  <div className="space-y-2">
-                  <p className="font-semibold text-lg text-emerald-600">
-                        {t.message}</p>
-                  <div className="text-sm text-gray-700 space-y-1">
-                  <p>
-                    <span className="font-medium text-gray-600">Patient Name:</span>{" "}
-                      {t.appointment.pationtName}
-                  </p>
-                  <p>
-                  <span className="font-medium text-gray-600">Start:</span>{" "}
-                    {t.appointment.start}
-                  </p>
-                  <p>
-                  <span className="font-medium text-gray-600">End:</span>{" "}
-                  {t.appointment.end}
-                  </p>
-                </div>
-              </div>
-             
-              {
-                selectAppoint &&(
-                  <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'>
-                    <div className='bg-white rounded-2xl p-6 max-w-md w-full shadow-lg relative'>
-                    <div className='flex flex-col space-y-2 text-gray-700 text-sm'>
-                       <h2 className="text-2xl font-semibold mb-4 text-sky-600">Appointment Details</h2>
-                      <button  className="absolute top-3 right-3 text-red-500 font-bold text-lg" onClick={() =>  setSelectAppoint(null)}>x</button>
-                      <p> <span className="font-medium text-gray-600">Pationt Name:</span>{" "}{selectAppoint.appointment.pationtName}</p>
-                      <p> <span className="font-medium text-gray-600">Pationt Age:</span>{" "}{selectAppoint.appointment.age}</p>
-                      <p> <span className="font-medium text-gray-600">Mobile Number:</span>{" "}{selectAppoint.appointment.mobileNumber}</p>
-                      <p> <span className="font-medium text-gray-600">day</span>{" "}{selectAppoint.appointment.day}</p>
-                      <p> <span className="font-medium text-gray-600">Start Time:</span>{" "}{selectAppoint.appointment.start}</p>
-                      <p> <span className="font-medium text-gray-600">End Time:</span>{" "}{selectAppoint.appointment.end}</p>
+          <Link
+            to={"/my-profile"}
+            className="transition-all duration-300 hover:text-sky-200"
+          >
+            <FaUserCircle size={44} />
+          </Link>
 
-                      <div >  
-                        {
-                         selectAppoint?.appointment?.status !== "pending"?(
-                          <p className='text-white m-2  h-8 text-center p-1 rounded font-bold bg-amber-500 font-sans'>you {selectAppoint.appointment.status} this appointment</p>
-                        ):
-                        (
-                         <div className='flex flex-row justify-evenly m-2'>
-                          <p>status is:{ t.isRead}</p>
-                          <br />
-                          <button className='bg-emerald-600 h-8 w-30 text-white rounded cursor-pointer' onClick={()=>handleAccepct(selectAppoint.appointment._id)}>Accept</button>
-                          <button className='bg-red-400 w-30 text-white rounded cursor-pointer'  onClick={()=>handleReject(selectAppoint.appointment._id)}>Reject</button>
-                        </div>
-                        )
+        </div>
 
-                       } 
-                      </div>
-                    
-                    </div>
+      </div>
 
-                    </div>
-                  </div>
-                )
-              }
-             
-              <div className="flex items-end h-full">
-              <button className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-500 rounded-lg hover:bg-blue-50 transition" onClick={() => setSelectAppoint(t)}>
-                See Details
-            </button>
+      {/* ================= MAIN ================= */}
+
+      <div className="flex flex-col items-center p-6">
+
+        <div className="w-full max-w-5xl">
+
+          <div className="flex items-center gap-4 mb-8">
+
+            <div className="flex items-center justify-center w-16 h-16 text-white shadow-lg rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600">
+
+              <FaBell className="text-3xl" />
+
+            </div>
+
+            <div>
+
+              <h1 className="text-4xl font-black text-slate-700">
+                Doctor Notifications
+              </h1>
+
+              <p className="mt-1 text-slate-500">
+                Manage your latest appointment updates
+              </p>
+
+            </div>
+
           </div>
-        </div>       
-          ))                         
-              }
-              </div>
-              
-         </div>
-         
-       </div>
-  )
-}
 
-export default Notification_user
+          {/* ================= EMPTY ================= */}
+
+          {notification.length === 0 ? (
+
+            <div className="p-10 text-center bg-white shadow-2xl rounded-[30px]">
+
+              <h1 className="text-3xl font-bold text-slate-700">
+                No Notifications
+              </h1>
+
+              <p className="mt-3 text-lg text-slate-500">
+                {message}
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="space-y-6">
+
+              {notification.map((t, index) => (
+
+                <div
+                  key={index}
+                  className="flex flex-col justify-between gap-5 p-6 transition-all duration-300 bg-white shadow-xl md:flex-row md:items-center rounded-3xl hover:shadow-2xl"
+                >
+
+                  {/* ================= LEFT ================= */}
+
+                  <div className="space-y-3">
+
+                    <h2 className="text-2xl font-bold text-sky-600">
+
+                      {t.title}
+
+                    </h2>
+
+                    <p className="text-lg font-medium text-slate-700">
+
+                      {t.message}
+
+                    </p>
+
+                    {t.appointment && (
+
+                      <div className="pt-2 space-y-2 text-slate-600">
+
+                        <p>
+
+                          <span className="font-bold">
+                            Patient :
+                          </span>{" "}
+
+                          {t.appointment.pationtName}
+
+                        </p>
+
+                        <p>
+
+                          <span className="font-bold">
+                            Date :
+                          </span>{" "}
+
+                          {new Date(
+                            t.appointment.day
+                          ).toLocaleDateString()}
+
+                        </p>
+
+                        <p>
+
+                          <span className="font-bold">
+                            Time :
+                          </span>{" "}
+
+                          {new Date(
+                            t.appointment.start
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+
+                        </p>
+
+                      </div>
+
+                    )}
+
+                  </div>
+
+                  {/* ================= RIGHT ================= */}
+
+                  <div className="flex flex-col items-start gap-4 md:items-end">
+
+                    <div
+                      className={`px-5 py-2 text-white rounded-2xl font-bold capitalize shadow-md ${statusStyle(
+                        t?.appointment?.status
+                      )}`}
+                    >
+
+                      {t?.appointment?.status || "pending"}
+
+                    </div>
+
+                    <button
+                      onClick={() => setSelectAppoint(t)}
+                      className="px-6 py-3 font-bold text-white transition-all duration-300 shadow-lg bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl hover:scale-105"
+                    >
+                      See Details
+                    </button>
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+      {/* ================= MODAL ================= */}
+
+      {selectAppoint && (
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40">
+
+          <div className="relative w-full max-w-xl p-8 bg-white shadow-2xl rounded-[35px]">
+
+            {/* CLOSE BUTTON */}
+
+            <button
+              onClick={() => setSelectAppoint(null)}
+              className="absolute text-3xl font-bold text-red-500 top-4 right-5"
+            >
+              ×
+            </button>
+
+            {/* ================= TITLE ================= */}
+
+            <h1 className="mb-8 text-4xl font-black text-center text-sky-600">
+
+              Appointment Details
+
+            </h1>
+
+            {/* ================= DETAILS ================= */}
+
+            {selectAppoint.appointment && (
+
+              <div className="space-y-4 text-lg text-slate-700">
+
+                <p>
+
+                  <span className="font-bold">
+                    Patient Name :
+                  </span>{" "}
+
+                  {selectAppoint.appointment.pationtName}
+
+                </p>
+
+                <p>
+
+                  <span className="font-bold">
+                    Age :
+                  </span>{" "}
+
+                  {selectAppoint.appointment.age}
+
+                </p>
+
+                <p>
+
+                  <span className="font-bold">
+                    Mobile :
+                  </span>{" "}
+
+                  {selectAppoint.appointment.mobileNumber}
+
+                </p>
+
+                <p>
+
+                  <span className="font-bold">
+                    Date :
+                  </span>{" "}
+
+                  {new Date(
+                    selectAppoint.appointment.day
+                  ).toLocaleDateString()}
+
+                </p>
+
+                <p>
+
+                  <span className="font-bold">
+                    Start :
+                  </span>{" "}
+
+                  {new Date(
+                    selectAppoint.appointment.start
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+
+                </p>
+
+                <p>
+
+                  <span className="font-bold">
+                    End :
+                  </span>{" "}
+
+                  {new Date(
+                    selectAppoint.appointment.end
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+
+                </p>
+
+                <p>
+
+                  <span className="font-bold">
+                    Status :
+                  </span>{" "}
+
+                  <span
+                    className={`px-4 py-2 text-white rounded-2xl text-sm capitalize ${statusStyle(
+                      selectAppoint.appointment.status
+                    )}`}
+                  >
+
+                    {selectAppoint.appointment.status}
+
+                  </span>
+
+                </p>
+
+              </div>
+
+            )}
+
+            {/* ================= ACTION BUTTONS ================= */}
+
+            <div className="flex justify-between gap-4 mt-10">
+
+              {selectAppoint?.appointment?.status === "pending" ? (
+
+                <>
+
+                  <button
+                    onClick={() =>
+                      handleAccept(
+                        selectAppoint.appointment._id
+                      )
+                    }
+                    className="w-full py-4 text-lg font-black text-white transition-all duration-300 bg-green-500 shadow-lg rounded-2xl hover:bg-green-600"
+                  >
+                    Accept
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleReject(
+                        selectAppoint.appointment._id
+                      )
+                    }
+                    className="w-full py-4 text-lg font-black text-white transition-all duration-300 bg-red-500 shadow-lg rounded-2xl hover:bg-red-600"
+                  >
+                    Reject
+                  </button>
+
+                </>
+
+              ) : (
+
+                <div className="w-full">
+
+                  <p
+                    className={`w-full py-4 text-lg font-bold text-center text-white rounded-2xl capitalize ${statusStyle(
+                      selectAppoint.appointment.status
+                    )}`}
+                  >
+
+                    You already{" "}
+                    {selectAppoint.appointment.status}{" "}
+                    this appointment
+
+                  </p>
+
+                </div>
+
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+  );
+
+};
+
+export default Notification;

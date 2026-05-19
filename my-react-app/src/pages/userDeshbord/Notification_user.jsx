@@ -1,176 +1,309 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useState } from 'react';
-
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaBell, FaUserCircle } from "react-icons/fa";
+import logo from "../../assets/Hello_Doctor_logo.png";
 
 const Notification_user = () => {
-  
-const[notification,setNotification]=useState([]);
-const[message,setMessage]=useState("");
-const[selectAppoint,setSelectAppoint]=useState("");
 
-const getMessageStyle = (type) => {
-  switch (type) {
-    case "add":
-      return "bg-orange-200 text-green-800 border-green-400"
-    case "approved":
-      return "bg-green-200 text-green-800 border-green-400";
-    case "rejected":
-      return "bg-red-400 text-red-800 border-red-400";
-    default:
-      return "bg-amber-200 text-amber-800 border-amber-400";
+  const [notifications, setNotifications] = useState([]);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // ================= FETCH NOTIFICATIONS =================
+
+  async function collectData() {
+
+    try {
+
+      setLoading(true);
+
+      const res = await fetch(
+        "http://localhost:8000/user/notificationUser",
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      console.log("notification data:", data);
+
+      if (!data.data || data.data.length === 0) {
+
+        setNotifications([]);
+        setMessage(data.message || "No notifications found");
+
+      } else {
+
+        setNotifications(data.data);
+
+      }
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+      setMessage("Something went wrong!");
+
+    }
+
+    finally {
+
+      setLoading(false);
+
+    }
+
   }
+
+  useEffect(() => {
+
+    collectData();
+
+  }, []);
+
+  // ================= TITLE COLOR =================
+
+  function titleColor(type) {
+
+    if (type === "approved") {
+
+      return "text-green-600";
+
+    }
+
+    if (type === "info") {
+
+      return "text-blue-600";
+
+    }
+
+    if (type === "rejected") {
+
+      return "text-red-600";
+
+    }
+
+    return "text-yellow-600";
+
+  }
+
+  // ================= CARD BORDER =================
+
+  function borderColor(type) {
+
+    if (type === "approved") {
+
+      return "border-green-500";
+
+    }
+
+    if (type === "info") {
+
+      return "border-blue-500";
+
+    }
+
+    if (type === "rejected") {
+
+      return "border-red-500";
+
+    }
+
+    return "border-yellow-500";
+
+  }
+
+  return (
+
+    <div className="min-h-screen bg-slate-100">
+
+      {/* ================= NAVBAR ================= */}
+
+      <div className="flex flex-row items-center h-16 px-4 text-center shadow-lg bg-sky-400 justify-between text-amber-50">
+
+        {/* LOGO */}
+
+        <div className="flex items-center gap-3 m-2">
+
+          <img
+            src={logo}
+            alt="Hello Doctor Logo"
+            className="object-contain w-45 h-35 rounded-full"
+          />
+
+        </div>
+
+        {/* NAV LINKS */}
+
+        <div className="flex items-center ml-auto space-x-4 font-bold">
+
+          <Link
+            to={"/userDeshbord"}
+            className="p-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 hover:rounded-2xl"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            to={"/my-profile"}
+            className="p-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 hover:rounded-2xl"
+          >
+            <FaUserCircle size={30} />
+          </Link>
+
+        </div>
+
+      </div>
+
+      {/* ================= MAIN ================= */}
+
+      <div className="p-6">
+
+        {/* ================= HEADER ================= */}
+
+        <div className="flex items-center justify-between p-6 bg-white shadow-lg rounded-3xl">
+
+          <div className="flex items-center gap-4">
+
+            <div className="p-4 rounded-2xl bg-sky-100">
+
+              <FaBell className="text-2xl text-sky-500" />
+
+            </div>
+
+            <div>
+
+              <h1 className="text-3xl font-bold text-sky-500">
+                Notifications
+              </h1>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Manage your appointment updates
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="px-5 py-2 font-bold rounded-2xl bg-sky-100 text-sky-600">
+
+            Total : {notifications.length}
+
+          </div>
+
+        </div>
+
+        {/* ================= NOTIFICATIONS ================= */}
+
+        <div className="mt-6">
+
+          {loading ? (
+
+            <div className="p-10 text-center bg-white shadow-lg rounded-3xl">
+
+              <p className="text-2xl font-bold text-gray-600">
+
+                Loading...
+
+              </p>
+
+            </div>
+
+          ) : notifications.length > 0 ? (
+
+            <div className="space-y-5">
+
+              {notifications.map((item, index) => (
+
+                <div
+                  key={index}
+                  className={`bg-white rounded-3xl shadow-md p-5 border-l-[8px] ${borderColor(
+                    item.type
+                  )}`}
+                >
+
+                  <div className="flex items-start justify-between gap-4">
+
+                    {/* LEFT SIDE */}
+
+                    <div>
+
+                      <h2
+                        className={`text-2xl font-bold ${titleColor(
+                          item.type
+                        )}`}
+                      >
+
+                        {item.title}
+
+                      </h2>
+
+                      <p className="mt-3 leading-7 text-gray-600 text-[16px]">
+
+                        {item.message}
+
+                      </p>
+
+                    </div>
+
+                    {/* RIGHT SIDE */}
+
+                    <div className="text-sm font-medium text-right text-gray-500 whitespace-nowrap">
+
+                      <p>
+
+                        {new Date(item.createdAt).toLocaleDateString()}
+
+                      </p>
+
+                      <p className="mt-1">
+
+                        {new Date(item.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          ) : (
+
+            <div className="py-24 text-center bg-white shadow-lg rounded-3xl">
+
+              <h1 className="text-3xl font-extrabold text-gray-700">
+
+                No Notifications Found
+
+              </h1>
+
+              <p className="mt-3 text-gray-400">
+
+                {message}
+
+              </p>
+
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
 };
 
-
-async  function collectData()
-{
-
-  try{
-     const res = await fetch("http://localhost:8000/notification/userNotification", {
-            method: "GET",
-            credentials: "include"  
-        });
-        const result=await res.json();
-        if(result.data.length===0 || !result.data)
-        {
-          setNotification([]);
-          setMessage(result.message);
-        
-        }
-        else{
-          setMessage(result.message);
-         
-          console.log(result.data);
-        
-
-    const appointmentWithdetails=await Promise.all(
-        result.data.map(async(item)=>
-        {
-            try{
-              
-            const appointId=item.appointmentId;
-            const appointRes=await fetch(`http://localhost:8000/appointment/getAppointmentByid/${appointId}`,
-              {credentials:"include"}
-            );
-            const details=await appointRes.json();
-
-            return {
-                ...item,
-                appointment: details.data
-
-            }
-             }
-             catch(error)
-             {
-                return{
-                    ...item,
-                     appointment:null
-                }
-                
-             }
-             
-        })
-    ) 
-    
-    console.log("appointment with the details",appointmentWithdetails);
-    setNotification(appointmentWithdetails);
-    }
-    }
-    catch(error)
-    {
-        console.log("something wents wrong!",error);
-    }
-    
-   
-  
-}
-  useEffect(()=>
-  {
-    collectData();
-  },[]);
-  
-  return (
-       <div>
-         <div className='flex flex-row items-center h-12 text-center bg-sky-500 justify-evenly text-amber-50'>
-         
-           <div className='m-2 text-2xl font-bold'>
-              Hello Doctor
-           </div>
-           <div className='flex flex-row ml-auto space-x-6 font-bold '>
-               
-                   <Link to={"/userDeshbord"} className='p-2 m-1 mask-3 hover:bg-amber-50 hover:text-sky-500 hover:rounded-1xl hover:rounded-2xl '>Home</Link>
-                   <Link to={"/notification-user"} className='p-2 m-1 mask-3 hover:text-sky-500 hover:rounded-1xl hover:bg-amber-50 hover:rounded-2xl '>Profile</Link>
-
-           </div>
-           <br/>
-         </div>
-         <div className='flex flex-col justify-center items-center'>
-              <div className='w-5xl mt-5'>
-               {
-               notification.map((t, index) => (
-               <div
-                  key={index}
-                  className="w-full max-w-4xl bg-white rounded-2xl shadow-md hover:shadow-lg transition p-5 mb-4 flex justify-between items-center">
-
-                  <div className="space-y-2">
-                  <p className={`text-lg rounded mt-2 p-2 font-bold border ${getMessageStyle(t.type)} `}>
-                  {t.message}
-                  </p>
-
-                  <div className="text-sm text-gray-700 space-y-1">
-                  <p>
-                    <span className="font-medium text-gray-600">Patient Name:</span>{" "}
-                      {t.appointment.pationtName}
-                  </p>
-                  <p>
-                  <span className="font-medium text-gray-600">Start:</span>{" "}
-                    {t.appointment.start}
-                  </p>
-                  <p>
-                  <span className="font-medium text-gray-600">End:</span>{" "}
-                  {t.appointment.end}
-                  </p>
-                </div>
-              </div>
-              {
-                selectAppoint &&(
-                  <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'>
-                    <div className='bg-white rounded-2xl p-6 max-w-md w-full shadow-lg relative'>
-                    <div className='flex flex-col space-y-2 text-gray-700 text-sm'>
-                       <h2 className="text-2xl font-semibold mb-4 text-sky-600">Appointment Details</h2>
-                     <button  className="absolute top-3 right-3 text-red-500 font-bold text-lg cursor-pointer" onClick={() =>  setSelectAppoint(null)}>x</button>
-                      <p> <span className="font-medium text-gray-600">Pationt Name:</span>{" "}{selectAppoint.pationtName}</p>
-                      <p> <span className="font-medium text-gray-600">Pationt Age:</span>{" "}{selectAppoint.age}</p>
-                      <p> <span className="font-medium text-gray-600">Mobile Number:</span>{" "}{selectAppoint.mobileNumber}</p>
-                      <p> <span className="font-medium text-gray-600">day</span>{" "}{selectAppoint.day}</p>
-                      <p> <span className="font-medium text-gray-600">Start Time:</span>{" "}{selectAppoint.start}</p>
-                      <p> <span className="font-medium text-gray-600">End Time:</span>{" "}{selectAppoint.end}</p>
-                    
-                    </div>
-                    
-                    </div>
-                  </div>
-                )
-              }
-              <div className="flex items-end h-full">
-              <button className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-500 rounded-lg hover:bg-blue-50 transition" onClick={() => setSelectAppoint(t.appointment)}>
-                See Details
-            </button>
-          </div>
-        </div>
-        
-))
-
-                
-                
-              }
-              </div>
-              
-         </div>
-         
-       </div>
-  )
-}
-
-export default Notification_user
+export default Notification_user;
