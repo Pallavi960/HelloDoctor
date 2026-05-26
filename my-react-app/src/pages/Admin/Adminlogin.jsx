@@ -63,7 +63,7 @@ const LoginUser = () => {
         <div className="flex flex-col justify-center w-full p-10 md:w-1/2">
 
           <h2 className="mb-8 text-3xl font-semibold text-center text-gray-700">
-            User Login
+            Admin Login
           </h2>
 
           <form onSubmit={handleData} className="space-y-6">

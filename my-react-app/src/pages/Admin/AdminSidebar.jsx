@@ -145,7 +145,7 @@ const AdminSidebar = ({ active }) => {
           {/* Performance Report */}
 
           <Link
-            to={"/reports"}
+            to={"/get-report"}
             className={`flex items-center gap-4 p-3 rounded-2xl font-semibold transition-all duration-300
             ${
               active === "reports"
@@ -161,7 +161,7 @@ const AdminSidebar = ({ active }) => {
           {/* Feedback */}
 
           <Link
-            to={"/feedback"}
+            to={"/get-feedback"}
             className={`flex items-center gap-4 p-3 rounded-2xl font-semibold transition-all duration-300
             ${
               active === "feedback"

@@ -187,12 +187,7 @@ const UserMyProfile = () => {
 
           {/* ================= ACTIVE PROFILE ================= */}
 
-          <Link
-            to={"/myProfile"}
-            className="text-white"
-          >
-            <FaUserCircle size={34} />
-          </Link>
+          
 
         </div>
 

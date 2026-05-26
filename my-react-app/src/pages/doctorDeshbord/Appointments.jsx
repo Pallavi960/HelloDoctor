@@ -70,6 +70,21 @@ const Appointments = () => {
     }
   }
 
+async function handleLogout() {
+    try {
+      const info = await fetch("http://localhost:8000/doctor/logout", {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await info.json();
+      alert(data.message);
+      navigate("/doctor-login");
+    } catch (error) {
+      console.log(error);
+      alert("Logout failed");
+    }
+  }
+
   // ================= ACTIONS =================
   async function handleAction(action, id) {
 
@@ -290,13 +305,11 @@ const Appointments = () => {
 
         <div className="flex items-center ml-auto space-x-5 font-bold">
 
-          <Link
-            to={"/Appontments"}
-            className="px-5 py-2 transition-all duration-300 bg-amber-50 text-sky-500 rounded-2xl"
-          >
-            Appointments
-          </Link>
+         
 
+            <Link to={"/doctorDeshbord"} 
+            className="p-2 transition-all hover:bg-amber-50 hover:text-sky-500 rounded-2xl">Dashboard
+            </Link>
           <Link
             to={"/add-slot"}
             className="px-5 py-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
@@ -311,12 +324,15 @@ const Appointments = () => {
             Notifications
           </Link>
 
+          <button onClick={handleLogout} className="px-4 py-2 transition-all bg-red-500 rounded-2xl hover:bg-red-600">Logout</button>
+          
           <Link
             to={"/my-profile"}
             className="transition-all duration-300 hover:text-sky-200"
           >
             <FaUserCircle size={40} />
           </Link>
+          
 
         </div>
 

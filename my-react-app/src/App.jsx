@@ -26,6 +26,9 @@ import AllUsers from './pages/Admin/Allusers'
 import Allappointment from './pages/Admin/Allappointment'
 import Homepage from './pages/Homepage'
 import UserMyProfile from './pages/userDeshbord/UserMyProfile'
+import Mymeeting from './pages/userDeshbord/Mymeeting'
+import Feedback from './pages/Admin/Feedback'
+import Report from './pages/Admin/Report'
 function App() {
   
   return (
@@ -55,7 +58,9 @@ function App() {
         <Route path='/allusers' element={<AllUsers/>}/>
         <Route path='/allAppointments' element={<Allappointment/>}/>
         <Route path='/user-my-profile' element={<UserMyProfile/>} />
-
+        <Route path='/user-meeting' element={<Mymeeting/>} />
+        <Route  path='/get-feedback' element={<Feedback/>} />
+        <Route  path='/get-report' element={<Report/>} />
       </Routes>
 
       </BrowserRouter>

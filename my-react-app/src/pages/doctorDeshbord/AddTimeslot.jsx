@@ -4,7 +4,6 @@ import {
   FaClock,
   FaArrowLeft,
   FaUserCircle,
-  FaSignOutAlt,
 } from "react-icons/fa";
 
 // ================= IMPORT LOGO =================
@@ -19,21 +18,15 @@ const AddTimeslot = () => {
   const [end, setEnd] = useState("");
 
   function addDay(e) {
-
     setDay(e.target.value);
-
   }
 
   function addStart(e) {
-
     setStart(e.target.value);
-
   }
 
   function addEnd(e) {
-
     setEnd(e.target.value);
-
   }
 
   // ================= LOGOUT =================
@@ -56,16 +49,13 @@ const AddTimeslot = () => {
 
       navigate("/doctor-login");
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
       console.log(error);
 
       alert("Logout failed");
 
     }
-
   }
 
   // ================= ADD SLOT =================
@@ -109,16 +99,16 @@ const AddTimeslot = () => {
       setStart("");
       setEnd("");
 
-    }
+      // ================= REDIRECT =================
+      navigate("/doctorDeshbord");
 
-    catch (error) {
+    } catch (error) {
 
       console.log(error);
 
       alert("Something went wrong!");
 
     }
-
   }
 
   return (
@@ -159,8 +149,6 @@ const AddTimeslot = () => {
             Appointments
           </Link>
 
-         
-
           <Link
             to={"/notification"}
             className="p-2 transition-all hover:bg-amber-50 hover:text-sky-500 rounded-2xl"
@@ -179,7 +167,7 @@ const AddTimeslot = () => {
             to={"/my-profile"}
             className="p-1 transition-all hover:text-sky-500"
           >
-            <FaUserCircle size={36} />
+            <FaUserCircle size={34} />
           </Link>
 
         </div>
@@ -188,32 +176,32 @@ const AddTimeslot = () => {
 
       {/* ================= MAIN ================= */}
 
-      <div className="flex items-center justify-center px-4 py-12">
+      <div className="flex items-center justify-center px-4 py-10">
 
         <form
           onSubmit={HandleSubmit}
-          className="w-full max-w-3xl"
+          className="w-full max-w-2xl"
         >
 
-          <div className="w-full p-10 bg-white shadow-2xl rounded-[35px]">
+          <div className="w-full p-7 bg-white shadow-2xl rounded-[28px]">
 
             {/* ================= HEADER ================= */}
 
-            <div className="flex items-center gap-4 mb-10">
+            <div className="flex items-center gap-3 mb-7">
 
-              <div className="flex items-center justify-center w-16 h-16 text-white rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg">
+              <div className="flex items-center justify-center w-12 h-12 text-white rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg">
 
-                <FaClock className="text-3xl" />
+                <FaClock className="text-2xl" />
 
               </div>
 
               <div>
 
-                <h1 className="text-4xl font-black text-slate-700">
+                <h1 className="text-2xl font-black text-slate-700">
                   Add Time Slot
                 </h1>
 
-                <p className="mt-1 text-slate-500">
+                <p className="mt-1 text-sm text-slate-500">
                   Create your available appointment schedule
                 </p>
 
@@ -223,9 +211,9 @@ const AddTimeslot = () => {
 
             {/* ================= DATE ================= */}
 
-            <div className="mb-6">
+            <div className="mb-5">
 
-              <label className="block mb-3 text-lg font-bold text-slate-700">
+              <label className="block mb-2 text-base font-bold text-slate-700">
                 Select Date
               </label>
 
@@ -233,16 +221,16 @@ const AddTimeslot = () => {
                 type="date"
                 value={day}
                 onChange={addDay}
-                className="w-full px-5 py-4 text-lg border-2 border-slate-200 rounded-2xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
+                className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
               />
 
             </div>
 
             {/* ================= START TIME ================= */}
 
-            <div className="mb-6">
+            <div className="mb-5">
 
-              <label className="block mb-3 text-lg font-bold text-slate-700">
+              <label className="block mb-2 text-base font-bold text-slate-700">
                 Start Time
               </label>
 
@@ -250,16 +238,16 @@ const AddTimeslot = () => {
                 type="time"
                 value={start}
                 onChange={addStart}
-                className="w-full px-5 py-4 text-lg border-2 border-slate-200 rounded-2xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
+                className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
               />
 
             </div>
 
             {/* ================= END TIME ================= */}
 
-            <div className="mb-10">
+            <div className="mb-7">
 
-              <label className="block mb-3 text-lg font-bold text-slate-700">
+              <label className="block mb-2 text-base font-bold text-slate-700">
                 End Time
               </label>
 
@@ -267,7 +255,7 @@ const AddTimeslot = () => {
                 type="time"
                 value={end}
                 onChange={addEnd}
-                className="w-full px-5 py-4 text-lg border-2 border-slate-200 rounded-2xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
+                className="w-full px-4 py-3 text-base border-2 border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-4 focus:ring-sky-200"
               />
 
             </div>
@@ -278,7 +266,7 @@ const AddTimeslot = () => {
 
               <Link
                 to={"/doctorDeshbord"}
-                className="flex items-center justify-center gap-2 w-1/3 py-4 font-bold border-2 border-slate-300 rounded-2xl text-slate-700 hover:bg-slate-100 transition-all"
+                className="flex items-center justify-center gap-2 w-1/3 py-3 font-bold border-2 border-slate-300 rounded-xl text-slate-700 hover:bg-slate-100 transition-all"
               >
 
                 <FaArrowLeft />
@@ -289,7 +277,7 @@ const AddTimeslot = () => {
 
               <button
                 type="submit"
-                className="w-2/3 py-4 text-lg font-black text-white transition-all duration-300 shadow-xl rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:scale-[1.02]"
+                className="w-2/3 py-3 text-base font-black text-white transition-all duration-300 shadow-xl rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:scale-[1.02]"
               >
                 Add Slot
               </button>

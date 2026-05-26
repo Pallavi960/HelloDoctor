@@ -10,90 +10,100 @@ const { get } = require("http");
 
 
 
-async function  register(req,res) {
-    const body=req.body;
-    if(!body)
-    {
+async function register(req, res) {
+    const body = req.body;
+    if (!body) {
         console.log("body not found!");
     }
-  
-    try{
-        const { name, email, password, spelization,degree, experience,fees,number}=req.body;
-        if(!name || !email || !password)
-        {
-            return res.json({message:"name email password are required!"});
-        }
 
-        const alredyExist=await doctors.findOne({email});
-        if(alredyExist)
-        {
-           return res.json({message:"Doctor with this mail id is already exists!"});
-        }
-      await doctors.create(
-            {
-                name, email, password, spelization, degree,experience,fees,number:Number(number)
-            }
-        )
+    try {
+        const { name, email, password, spelization, degree, experience, fees, number } = req.body;
         
-        return res.json({message:"doctor account created successfully!"});
+        // add these 2 lines
+        const image = req.files?.image?.[0]?.path || "";
+        const cv    = req.files?.cv?.[0]?.path    || "";
+
+        console.log("body:", req.body);
+        console.log("files:", req.files);
+        if (!name || !email || !password) {
+            return res.json({ message: "name email password are required!" });
+        }
+
+        const alredyExist = await doctors.findOne({ email });
+        if (alredyExist) {
+            return res.json({ message: "Doctor with this mail id is already exists!" });
+        }
+
+        await doctors.create({
+            name, email, password, spelization,
+            degree, experience, fees,
+            number: Number(number),
+            image, // added
+            cv     // added
+        });
+
+        return res.json({ message: "doctor account created successfully!" });
     }
-    catch(error){
+    catch (error) {
         console.log(error);
-        return res.json({message:"something went's wrong!"});
-    }   
+        return res.json({ message: "something went's wrong!" });
+    }
 }
 
 
 
 
-async function login(req,res) {
-    try{
-        const {email,password}=req.body;
-        if(!email || !password)
-        {
-            return res.json({message:"email and password must require fo the login!"});
+
+
+
+async function login(req, res) {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.json({ message: "Email and password are required for login!" });
         }
-        else{
-            const findDoctor= await doctors.findOne({email,password});
-            if(!findDoctor)
-            {
-                 return res.json(
-                    {
-                        success:false,
-                        message:"please register first"
-                    });
-            }
-            if(findDoctor.password==password && findDoctor.password)
-            {
-                 console.log("password matched");
-                 const token=setUser(findDoctor,"Doctor");
-                 console.log("doctor token is:",token);
-                 res.cookie("uuid",token);
-                 return res.json(
-                    {
-                        success:true,
-                        message:"login successfully"
-                    });
 
-            }
-            else{
+        // Find doctor by email only first
+        const findDoctor = await doctors.findOne({ email });
 
-                return res.json({
-                success:false,
-                message:"Oops password not match!",
-                });
+        if (!findDoctor) {
+            return res.json({
+                success: false,
+                message: "Please register first"
+            });
+        }
 
-            }
-            
+        //  Check if doctor is approved by admin
+        if (findDoctor.verify !== "approved") {
+            return res.json({
+                success: false,
+                message: "Your account is not approved yet. Once admin approves your profile, you'll receive a mail,then you can login!"
+            });
+        }
+
+        // Check password
+        if (findDoctor.password == password) {
+            console.log("password matched");
+            const token = setUser(findDoctor, "Doctor");
+            console.log("doctor token is:", token);
+            res.cookie("uuid", token);
+            return res.json({
+                success: true,
+                message: "Login successfully"
+            });
+        } else {
+            return res.json({
+                success: false,
+                message: "Oops! Password does not match.",
+            });
         }
     }
-   catch(error)
-    {
+    catch (error) {
         console.log(error);
-        return res.json({message:"something wents wrong!"});
+        return res.json({ message: "Something went wrong!" });
     }
 }
-
 async function logout(req,res) {
     try{
         res.clearCookie("uuid");
@@ -108,9 +118,8 @@ async function logout(req,res) {
 
 
 async function addTimeslot(req,res) {
-//   const doctorId=req.user?.id;
+ const doctorId=req.user?.id;
 //   console.log("doctor id is:",doctorId);
-    const doctorId="696b7709a7f15fd43c663b04";
    try{
     const doctor=await doctors.findById(doctorId);
     console.log(doctor);
@@ -345,10 +354,6 @@ async function updateProfile(req, res) {
     try {
 
         const doctorId = req.user?.id;
-        console.log("BODY:", req.body);
-
-        // SAFE CHECK
-
         if (!req.body) {
             return res.json({
                 success: false,
@@ -500,6 +505,32 @@ async function getDoctorSlots(req, res) {
 
 }
 
+async function deleteDoctor(req, res) {
+    try {
+        const doctorId = req.params.id;
+        const deletedDoctor = await doctors.findByIdAndDelete(doctorId);    
+        if (!deletedDoctor) {
+
+            return res.json({
+                success: false,
+                message: "Doctor not found!"
+            });
+        }
+
+        return res.json({
+            success: true,
+            message: "Doctor deleted successfully!"
+        });
+    }
+    catch (error) {
+        console.log(error);
+        return res.json({
+            success: false,
+            message: "Something went wrong!"
+        });
+    }
+}
+
 
 
 module.exports={
@@ -515,6 +546,7 @@ module.exports={
     myprofile,
     updateProfile,
     getAllDoctors,
-    getDoctorSlots   
+    getDoctorSlots,
+    deleteDoctor   
 
 }

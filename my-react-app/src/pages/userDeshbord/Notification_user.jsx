@@ -55,6 +55,20 @@ const Notification_user = () => {
     }
 
   }
+async function handleLogout() {
+    try {
+      const res = await fetch(
+        "http://localhost:8000/user/logout",
+        { method: "GET", credentials: "include" }
+      );
+      const data = await res.json();
+      alert(data.message);
+      navigate("/user-login");
+    } catch (error) {
+      console.log(error);
+      alert("Logout failed!");
+    }
+  }
 
   useEffect(() => {
 
@@ -136,7 +150,7 @@ const Notification_user = () => {
 
         {/* NAV LINKS */}
 
-        <div className="flex items-center ml-auto space-x-4 font-bold">
+        <div className="flex flex-row items-center ml-auto space-x-4 font-bold">
 
           <Link
             to={"/userDeshbord"}
@@ -145,12 +159,15 @@ const Notification_user = () => {
             Dashboard
           </Link>
 
-          <Link
-            to={"/my-profile"}
-            className="p-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 hover:rounded-2xl"
-          >
-            <FaUserCircle size={30} />
-          </Link>
+          <Link to={"/serch-doctor"} className="p-2 transition-all duration-300 hover:bg-amber-50 hover:text-sky-500 hover:rounded-2xl">Search Doctor</Link>
+
+           <button onClick={handleLogout} className="p-2 px-4 transition-all duration-300 bg-red-500 rounded-2xl hover:bg-red-400">Logout</button>
+           <Link to={"/user-my-profile"}
+             className="flex items-center gap-2 p-2 transition-all duration-300 hover:text-sky-500 hover:bg-amber-50 hover:rounded-2xl"
+             >
+              <FaUserCircle size={36} />
+             
+            </Link>
 
         </div>
 

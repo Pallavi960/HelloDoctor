@@ -243,6 +243,30 @@ async function updateUserProfile(req, res) {
 
 }
 
+async function deleteUser(req, res) {   
+    try {
+        const userId = req.params.id;
+        const deletedUser = await users.findByIdAndDelete(userId);
+        if (!deletedUser) {
+            return res.json({
+                success: false,
+                message: "User not found!"
+            });
+        }   
+        return res.json({
+            success: true,
+            message: "User deleted successfully!"
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            success: false,
+            message: "Something went wrong!"
+        });
+    }   
+
+}
+
 
 
 
@@ -254,5 +278,6 @@ module.exports={
     countUsers,
     getUserById,
     myprofile,
-    updateUserProfile
+    updateUserProfile,
+    deleteUser
 }

@@ -27,7 +27,7 @@ app.use("/user",userRoute);
 app.use("/appointment",appointmentRoute);
 app.use("/notification",notificationRoute);
 app.use("/admin",adminRoute);
-
+app.use("/uploads", express.static("uploads"));
 
 
 connectMongoDB("mongodb://localhost:27017/helloDoctor").then(() => {

@@ -2,19 +2,21 @@ const mongoose = require("mongoose");
 
 const feedbackSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-
-    email: {
-      type: String,
+   userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
       required: true,
     },
 
     message: {
       type: String,
       required: true,
+    },
+    star: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
     },
   },
   {

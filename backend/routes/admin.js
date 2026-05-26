@@ -1,11 +1,12 @@
 const express=require("express");
 const {adminLogin,getAlldoctors,findPending,approveRequest,rejectRequest,adminlogout,getAllusers,getAllappointment}=require("../controllers/admin");
-const {getDoctorByid}=require("../controllers/doctor");
+const {getDoctorByid,deleteDoctor}=require("../controllers/doctor");
 const {auth,requireRole}=require("../middleware/auth");
 const adminRoute=express.Router();
-const {getUserById}=require("../controllers/users");
+const {getUserById,deleteUser}=require("../controllers/users");
 const {findPendingAppointments,findrejectAppointments,completedAppointment,findApprovedAppointments,adminCompleteAppointment}=require("../controllers/appointment");
 const {acceptAppointment,rejectAppointment,deleteAppointment}=require("../controllers/appointment");
+const {getFeedback}=require("../controllers/feedback");
 
 //complete testing on the postman
 adminRoute.post("/login",adminLogin);
@@ -29,4 +30,7 @@ adminRoute.get("/findrejectAppointments",auth,requireRole("Admin"),findrejectApp
 adminRoute.get("/findApprovedAppointments",auth,requireRole("Admin"),findApprovedAppointments);
 adminRoute.get("/findrejectAppointments",auth,requireRole("Admin"),findrejectAppointments);
 adminRoute.get("/adminCompleteAppointment/:id",auth,requireRole("Admin"),adminCompleteAppointment);
+adminRoute.get("/get-feedback",auth,requireRole("Admin"),getFeedback);
+adminRoute.delete("/deleteDoctor/:id",auth,requireRole("Admin"),deleteDoctor);
+adminRoute.delete("/deleteUser/:id",auth,requireRole("Admin"),deleteUser);
 module.exports=adminRoute;

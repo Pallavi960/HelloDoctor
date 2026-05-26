@@ -51,6 +51,17 @@ const doctorSchema=new mongoose.Schema(
            default: "pending",
            enum:["pending","approved","rejected"]
         },
+
+       // added
+       image:{
+           type:String,
+           default:""
+       },
+       cv:{
+           type:String,
+           default:""
+       },
+
        timeSlots:[
         {
             day:Date,

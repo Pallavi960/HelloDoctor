@@ -11,6 +11,8 @@ function RegisterDoctor() {
     const [fees, Setfees] = useState("");
     const [password, setPassword] = useState("");
     const [number, setNumber] = useState("");
+    const [image, setImage] = useState(null);   // added
+    const [cv, setCv] = useState(null);          // added
 
     function handleName(e) { Setname(e.target.value); }
     function handleEmail(e) { Setemail(e.target.value); }
@@ -20,15 +22,29 @@ function RegisterDoctor() {
     function handlFees(e) { Setfees(e.target.value); }
     function handlNumber(e) { setNumber(e.target.value); }
     function handlePassword(e) { setPassword(e.target.value); }
+    function handleImage(e) { setImage(e.target.files[0]); }   // added
+    function handleCv(e) { setCv(e.target.files[0]); }          // added
 
     function collectData(e) {
         e.preventDefault();
-        const userData = { name, email, degree, spelization, experience, fees, number, password };
-        console.log(userData);
+
+        // changed to FormData instead of JSON
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("degree", degree);
+        formData.append("spelization", spelization);
+        formData.append("experience", experience);
+        formData.append("fees", fees);
+        formData.append("number", number);
+        formData.append("password", password);
+        formData.append("image", image);  // added
+        formData.append("cv", cv);         // added
+
         fetch("http://localhost:8000/doctor/register", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData),
+            // no Content-Type header — browser sets it automatically for FormData
+            body: formData,
         })
             .then(res => res.json())
             .then(data => {
@@ -36,6 +52,7 @@ function RegisterDoctor() {
                 alert(data.message);
             })
             .catch((error) => console.log(error));
+
         Setname("");
         setNumber("");
         Setdegree("");
@@ -44,6 +61,8 @@ function RegisterDoctor() {
         Setspelization("");
         Setemail("");
         setPassword("");
+        setImage(null);  // added
+        setCv(null);      // added
     }
 
     return (
@@ -52,7 +71,6 @@ function RegisterDoctor() {
 
                 <form onSubmit={collectData} className="flex flex-col items-center justify-center w-full">
 
-                    {/* Title */}
                     <h1 className="text-2xl font-extrabold text-blue-900 mb-6 text-center">
                         Doctor Register
                     </h1>
@@ -127,6 +145,28 @@ function RegisterDoctor() {
                             onChange={handlePassword}
                             placeholder="Password"
                         />
+                    </div>
+
+                    {/* Row 5 — Image & CV (added) */}
+                    <div className="flex gap-2">
+                        <div className="flex flex-col m-2 w-70">
+                            <label className="text-slate-500 text-sm mb-1 text-center">Profile Image</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImage}
+                                className="p-2 rounded-xl bg-sky-50 border-2 border-transparent focus:border-sky-400 focus:outline-none text-slate-700"
+                            />
+                        </div>
+                        <div className="flex flex-col m-2 w-70">
+                            <label className="text-slate-500 text-sm mb-1 text-center">Upload CV (PDF)</label>
+                            <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={handleCv}
+                                className="p-2 rounded-xl bg-sky-50 border-2 border-transparent focus:border-sky-400 focus:outline-none text-slate-700"
+                            />
+                        </div>
                     </div>
 
                     {/* Login Link */}
