@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { Link } from 'react-router-dom';
 
  async function handleSlot(e) {
     e.preventDefault();
-    const data=await fetch(`http://localhost:8000/doctor/my-timing/${id}`);
+    const data=await apiFetch(`${API_URL}/doctor/my-timing/${id}`);
     const res=data.json();
     if(res.getSlot.length===0)
     {

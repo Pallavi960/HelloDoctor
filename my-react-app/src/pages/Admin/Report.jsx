@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState, useRef } from "react";
 import AdminSidebar from "./AdminSidebar";
 import {
@@ -46,8 +47,8 @@ const Report = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        "http://localhost:8000/admin/getAllappointments",
+      const res = await apiFetch(
+        API_URL + '/admin/getAllappointments',
         { credentials: "include" }
       );
 
@@ -71,8 +72,8 @@ const Report = () => {
 
   async function fetchDoctors() {
     try {
-      const res = await fetch(
-        "http://localhost:8000/admin/getAlldoctors",
+      const res = await apiFetch(
+        API_URL + '/admin/getAlldoctors',
         { credentials: "include" }
       );
 
@@ -104,8 +105,8 @@ const Report = () => {
       setDoctorReport(null);
 
       // FETCH ALL APPOINTMENTS AGAIN TO FILTER
-      const res = await fetch(
-        "http://localhost:8000/admin/getAllappointments",
+      const res = await apiFetch(
+        API_URL + '/admin/getAllappointments',
         { credentials: "include" }
       );
 

@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaBell, FaUserCircle, FaVideo } from "react-icons/fa";
@@ -12,8 +13,8 @@ const UserNotification = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        "http://localhost:8000/user/notificationUser",
+      const res = await apiFetch(
+        API_URL + '/user/notificationUser',
         {
           credentials: "include",
         }
@@ -40,8 +41,8 @@ const UserNotification = () => {
   // ================= FETCH MEETING LINK =================
   async function getMeetingLink(appointmentId) {
     try {
-      const res = await fetch(
-        `http://localhost:8000/appointment/get/${appointmentId}`,
+      const res = await apiFetch(
+        `${API_URL}/appointment/get/${appointmentId}`,
         {
           credentials: "include",
         }

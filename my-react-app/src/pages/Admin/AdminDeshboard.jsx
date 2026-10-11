@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "./AdminSidebar";
 
@@ -11,7 +12,7 @@ const AdminDeshboard = () => {
 
   async function handleAccept(id) {
     try {
-      const res = await fetch(`http://localhost:8000/admin/approveRequest/${id}`, { credentials: "include" });
+      const res = await apiFetch(`${API_URL}/admin/approveRequest/${id}`, { credentials: "include" });
       const info = await res.json();
       alert(info.message);
       setDoctordata(null);
@@ -24,7 +25,7 @@ const AdminDeshboard = () => {
 
   async function handlecountDoctors() {
     try {
-      const res = await fetch(`http://localhost:8000/doctor/count-doctors`);
+      const res = await apiFetch(`${API_URL}/doctor/count-doctors`);
       const info = await res.json();
       setDoctorcount(info.count);
     } catch (error) {
@@ -34,7 +35,7 @@ const AdminDeshboard = () => {
 
   async function handlecountUsers() {
     try {
-      const res = await fetch(`http://localhost:8000/user/user-count`);
+      const res = await apiFetch(`${API_URL}/user/user-count`);
       const info = await res.json();
       setcountUsers(info.count);
     } catch (error) {
@@ -44,7 +45,7 @@ const AdminDeshboard = () => {
 
   async function handleReject(id, reason) {
     try {
-      const res = await fetch(`http://localhost:8000/admin/rejectRequest/${id}`, {
+      const res = await apiFetch(`${API_URL}/admin/rejectRequest/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason }),
@@ -61,7 +62,7 @@ const AdminDeshboard = () => {
 
   async function handleRequest() {
     try {
-      const res = await fetch(`http://localhost:8000/admin/getPendinglist`, { credentials: "include" });
+      const res = await apiFetch(`${API_URL}/admin/getPendinglist`, { credentials: "include" });
       const info = await res.json();
       setRequest(info.data || []);
       setMessage(info.message);
@@ -71,12 +72,12 @@ const AdminDeshboard = () => {
   }
 
   function openCV(cvPath) {
-    const url = "http://localhost:8000/" + cvPath.replace(/\\/g, "/");
+    const url = API_URL + '/' + cvPath.replace(/\\/g, "/");
     window.open(url, "_blank");
   }
 
   function getImageUrl(imagePath) {
-    return "http://localhost:8000/" + imagePath.replace(/\\/g, "/");
+    return API_URL + '/' + imagePath.replace(/\\/g, "/");
   }
 
   useEffect(() => {

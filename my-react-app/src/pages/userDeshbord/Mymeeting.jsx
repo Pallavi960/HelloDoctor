@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -50,8 +51,8 @@ const MyMeeting = () => {
 
       setLoading(true);
 
-      const res = await fetch(
-        "http://localhost:8000/user/user-appointment",
+      const res = await apiFetch(
+        API_URL + '/user/user-appointment',
         {
           method: "GET",
           credentials: "include",
@@ -105,8 +106,8 @@ const MyMeeting = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/user/logout",
+      const res = await apiFetch(
+        API_URL + '/user/logout',
         {
           method: "GET",
           credentials: "include",

@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -35,8 +36,8 @@ const AddTimeslot = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/doctor/logout",
+      const res = await apiFetch(
+        API_URL + '/doctor/logout',
         {
           method: "GET",
           credentials: "include",
@@ -76,8 +77,8 @@ const AddTimeslot = () => {
 
       const data = { day, start, end };
 
-      const res = await fetch(
-        "http://localhost:8000/doctor/add-slot",
+      const res = await apiFetch(
+        API_URL + '/doctor/add-slot',
         {
           method: "POST",
 

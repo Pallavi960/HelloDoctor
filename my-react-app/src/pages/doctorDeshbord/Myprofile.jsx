@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
@@ -18,7 +19,7 @@ const Myprofile = () => {
   async function collectData() {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/doctor/myprofile", {
+      const response = await apiFetch(API_URL + '/doctor/myprofile', {
         method: "GET",
         credentials: "include",
       });
@@ -45,7 +46,7 @@ const Myprofile = () => {
 
   async function updateProfile() {
     try {
-      const response = await fetch("http://localhost:8000/doctor/update-profile", {
+      const response = await apiFetch(API_URL + '/doctor/update-profile', {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -98,7 +99,7 @@ const Myprofile = () => {
                 {/* ===== ONLY THIS PART CHANGED ===== */}
                               {doctor.image ? (
                 <img
-                  src={`http://localhost:8000/${doctor.image.replace(/\\/g, "/")}`}
+                  src={`${API_URL}/${doctor.image.replace(/\\/g, "/")}`}
                   alt="Doctor"
                   className="w-28 h-28 rounded-full object-cover shadow-lg border-4 border-white"
                 />

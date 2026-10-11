@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/Hello_Doctor_logo.png";
@@ -12,12 +13,12 @@ const SerchDoctor = () => {
     const [msg, setMessage] = useState("");
 
     function getImageUrl(imagePath) {
-        return "http://localhost:8000/" + imagePath.replace(/\\/g, "/");
+        return API_URL + '/' + imagePath.replace(/\\/g, "/");
     }
 
     async function getAllDoctors() {
         try {
-            const data = await fetch("http://localhost:8000/user/all-doctors", {
+            const data = await apiFetch(API_URL + '/user/all-doctors', {
                 method: "GET",
                 credentials: "include"
             });
@@ -43,8 +44,8 @@ const SerchDoctor = () => {
 
 async function handleLogout() {
     try {
-      const res = await fetch(
-        "http://localhost:8000/user/logout",
+      const res = await apiFetch(
+        API_URL + '/user/logout',
         { method: "GET", credentials: "include" }
       );
       const data = await res.json();

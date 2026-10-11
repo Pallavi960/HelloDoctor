@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/Hello_Doctor_logo.png";
@@ -14,7 +15,7 @@ const LoginUser = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/user/login", {
+      const res = await apiFetch(API_URL + '/user/login', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,8 @@
 const users=require("../models/users");
 const{ v4:uuidv4 } =require("uuid");
 const { setUser }=require("../services/userAuth");
+const { hashPassword, verifyPassword } = require("../services/password");
+const cookieOptions = require("../services/cookieOptions");
 
 async function register(req,res) {
     try{
@@ -15,9 +17,10 @@ async function register(req,res) {
         return res.json({message:"this mail id is already registerd!"});
     }
   
+     const passwordHash = await hashPassword(password);
      await users.create(
         {
-                name,email,password
+                name,email,password:passwordHash
        });
      res.json({message:"account created successfully!"});  
     
@@ -39,7 +42,7 @@ async function login(req,res) {
             return res.json({message:"email and password must require fo the login!"});
         }
         else{
-            const finduser= await users.findOne({email});
+            const finduser= await users.findOne({email}).select("+password");
              if(!finduser)
             {
 
@@ -49,11 +52,10 @@ async function login(req,res) {
                         message:"please register first"
                     });
             }
-            if(finduser.password===password)
+            if(await verifyPassword(finduser, password))
             {    
                 const token=setUser(finduser,"user");
-                console.log("token:",token);
-                res.cookie("uuid",token);
+                res.cookie("uuid",token,cookieOptions);
                 
                 return res.json(
                     {
@@ -82,7 +84,7 @@ async function login(req,res) {
 
 async function logout(req,res) {
     try{
-        res.clearCookie("uuid");
+        res.clearCookie("uuid",cookieOptions);
         return res.json({
             success:true,
             message:"logout successfully!"
@@ -188,7 +190,7 @@ async function myprofile(req,res) {
     {
         return res.status(500).json({
             message: "Something went wrong!",
-            error: error.message
+            error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error.message
         });
     }
 
@@ -216,7 +218,7 @@ async function updateUserProfile(req, res) {
 
         if (password) {
 
-            findUser.password = password;
+            findUser.password = await hashPassword(password);
 
         }
 

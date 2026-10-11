@@ -1,6 +1,8 @@
 const { response } = require("express");
 const{ v4:uuidv4 } =require("uuid");
 const { setUser }=require("../services/userAuth");
+const { hashPassword, verifyPassword } = require("../services/password");
+const cookieOptions = require("../services/cookieOptions");
 
 const appointments=require("../models/appointment");
 
@@ -23,8 +25,6 @@ async function register(req, res) {
         const image = req.files?.image?.[0]?.path || "";
         const cv    = req.files?.cv?.[0]?.path    || "";
 
-        console.log("body:", req.body);
-        console.log("files:", req.files);
         if (!name || !email || !password) {
             return res.json({ message: "name email password are required!" });
         }
@@ -34,8 +34,9 @@ async function register(req, res) {
             return res.json({ message: "Doctor with this mail id is already exists!" });
         }
 
+        const passwordHash = await hashPassword(password);
         await doctors.create({
-            name, email, password, spelization,
+            name, email, password:passwordHash, spelization,
             degree, experience, fees,
             number: Number(number),
             image, // added
@@ -65,7 +66,7 @@ async function login(req, res) {
         }
 
         // Find doctor by email only first
-        const findDoctor = await doctors.findOne({ email });
+        const findDoctor = await doctors.findOne({ email }).select("+password");
 
         if (!findDoctor) {
             return res.json({
@@ -83,11 +84,9 @@ async function login(req, res) {
         }
 
         // Check password
-        if (findDoctor.password == password) {
-            console.log("password matched");
+        if (await verifyPassword(findDoctor, password)) {
             const token = setUser(findDoctor, "Doctor");
-            console.log("doctor token is:", token);
-            res.cookie("uuid", token);
+            res.cookie("uuid", token, cookieOptions);
             return res.json({
                 success: true,
                 message: "Login successfully"
@@ -106,7 +105,7 @@ async function login(req, res) {
 }
 async function logout(req,res) {
     try{
-        res.clearCookie("uuid");
+        res.clearCookie("uuid", cookieOptions);
         return res.json({message:"logout successfully!"});
     }
     catch(error)
@@ -150,7 +149,10 @@ async function addTimeslot(req,res) {
     }
     catch(error)
     {
-        return res.json({message:"something wents wrong!",error});
+        return res.json({
+            message:"something wents wrong!",
+            error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error
+        });
     }   
 }
 
@@ -269,7 +271,7 @@ async function getDoctorByid(req, res) {
     console.log("error is:",error);
     return res.status(500).json({
       message: "Something went wrong!",
-      error: error.message
+      error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error.message
     });
   }
 }
@@ -316,7 +318,7 @@ async function myprofile(req,res) {
     {
         return res.status(500).json({
             message: "Something went wrong!",
-            error: error.message
+            error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error.message
         });
     }
 
@@ -365,13 +367,14 @@ async function updateProfile(req, res) {
         const fees = req.body.fees;
         const number = req.body.number;
 
+        const updates = { fees, number };
+        if (password) {
+            updates.password = await hashPassword(password);
+        }
+
         const updatedDoctor = await doctors.findByIdAndUpdate(
             doctorId,
-            {
-                password,
-                fees,
-                number
-            },
+            updates,
             {
                 new: true
             }

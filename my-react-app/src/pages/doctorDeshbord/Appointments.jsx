@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
@@ -21,25 +22,25 @@ const Appointments = () => {
 
       if (type === "pending") {
         url =
-          "http://localhost:8000/doctor/doctorsPendingAppointments";
+          API_URL + '/doctor/doctorsPendingAppointments';
       }
 
       if (type === "approved") {
         url =
-          "http://localhost:8000/doctor/doctorsApprovedAppointments";
+          API_URL + '/doctor/doctorsApprovedAppointments';
       }
 
       if (type === "completed") {
         url =
-          "http://localhost:8000/doctor/doctorsCompleteAppointments";
+          API_URL + '/doctor/doctorsCompleteAppointments';
       }
 
       if (type === "rejected") {
         url =
-          "http://localhost:8000/doctor/doctorsRejectAppointments";
+          API_URL + '/doctor/doctorsRejectAppointments';
       }
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         credentials: "include",
       });
 
@@ -72,7 +73,7 @@ const Appointments = () => {
 
 async function handleLogout() {
     try {
-      const info = await fetch("http://localhost:8000/doctor/logout", {
+      const info = await apiFetch(API_URL + '/doctor/logout', {
         method: "GET",
         credentials: "include",
       });
@@ -94,23 +95,23 @@ async function handleLogout() {
       let method = "PUT";
 
       if (action === "approve") {
-        url = `http://localhost:8000/doctor/accept/${id}`;
+        url = `${API_URL}/doctor/accept/${id}`;
       }
 
       if (action === "reject") {
-        url = `http://localhost:8000/doctor/reject/${id}`;
+        url = `${API_URL}/doctor/reject/${id}`;
       }
 
       if (action === "complete") {
-        url = `http://localhost:8000/doctor/complete/${id}`;
+        url = `${API_URL}/doctor/complete/${id}`;
       }
 
       if (action === "delete") {
-        url = `http://localhost:8000/doctor/delete/${id}`;
+        url = `${API_URL}/doctor/delete/${id}`;
         method = "DELETE";
       }
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method,
         credentials: "include",
         headers: {

@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Eye, Trash2 } from "lucide-react";
@@ -13,17 +14,17 @@ const AllDoctors = () => {
   const navigate = useNavigate();
 
   function getImageUrl(imagePath) {
-    return "http://localhost:8000/" + imagePath.replace(/\\/g, "/");
+    return API_URL + '/' + imagePath.replace(/\\/g, "/");
   }
 
   function openCV(cvPath) {
-    const url = "http://localhost:8000/" + cvPath.replace(/\\/g, "/");
+    const url = API_URL + '/' + cvPath.replace(/\\/g, "/");
     window.open(url, "_blank");
   }
 
   async function collectData() {
     try {
-      const data = await fetch("http://localhost:8000/admin/getAlldoctors", {
+      const data = await apiFetch(API_URL + '/admin/getAlldoctors', {
         credentials: "include",
       });
 
@@ -59,8 +60,8 @@ const AllDoctors = () => {
       setDeleteLoading(true);
 
       // STEP 1 — GET ALL APPOINTMENTS
-      const apptRes = await fetch(
-        "http://localhost:8000/admin/getAllappointments",
+      const apptRes = await apiFetch(
+        API_URL + '/admin/getAllappointments',
         { credentials: "include" }
       );
 
@@ -85,8 +86,8 @@ const AllDoctors = () => {
       await Promise.all(
         toReject.map(async (a) => {
           try {
-            await fetch(
-              `http://localhost:8000/admin/reject/${a._id}`,
+            await apiFetch(
+              `${API_URL}/admin/reject/${a._id}`,
               {
                 method: "POST",
                 credentials: "include",
@@ -100,8 +101,8 @@ const AllDoctors = () => {
       );
 
       // STEP 4 — DELETE THE DOCTOR
-      const deleteRes = await fetch(
-        `http://localhost:8000/admin/deleteDoctor/${doctorData._id}`,
+      const deleteRes = await apiFetch(
+        `${API_URL}/admin/deleteDoctor/${doctorData._id}`,
         {
           method: "DELETE",
           credentials: "include",

@@ -1,6 +1,7 @@
 const doctors = require("../models/doctor");
 const { sendApprovalEmail,sendRejectEmail } = require("../services/mailService");
 const { setUser }=require("../services/userAuth");
+const cookieOptions = require("../services/cookieOptions");
 const users=require("../models/users");
 const appointment = require("../models/appointment");
 
@@ -16,8 +17,8 @@ async function adminLogin(req, res) {
       });
     }
 
-    const adminEmail = "admin@hellodoctor.com";
-    const adminPassword = "admin123";
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
     if (email === adminEmail && password === adminPassword) {
 
@@ -28,9 +29,7 @@ async function adminLogin(req, res) {
 
       const token = setUser(adminData, "Admin");
 
-      res.cookie("uuid", token, {
-        httpOnly: true,
-      });
+      res.cookie("uuid", token, cookieOptions);
 
       return res.json({
         success: true,
@@ -57,12 +56,7 @@ async function adminLogin(req, res) {
 async function adminlogout(req, res) {
   try {
 
-    res.clearCookie("uuid", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false,
-      path: "/",
-    });
+    res.clearCookie("uuid", cookieOptions);
 
     return res.json({
       success: true,

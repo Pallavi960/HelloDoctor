@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -42,8 +43,8 @@ const User_Deshbord = () => {
   async function collectData() {
     try {
 
-      const data = await fetch(
-        "http://localhost:8000/user/all-doctors",
+      const data = await apiFetch(
+        API_URL + '/user/all-doctors',
         {
           method: "GET",
           credentials: "include",
@@ -73,8 +74,8 @@ const User_Deshbord = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/appointment/user-appointments",
+      const res = await apiFetch(
+        API_URL + '/appointment/user-appointments',
         {
           credentials: "include",
         }
@@ -104,8 +105,8 @@ const User_Deshbord = () => {
 
     try {
 
-      const res = await fetch(
-        `http://localhost:8000/appointment/get/${appointmentId}`,
+      const res = await apiFetch(
+        `${API_URL}/appointment/get/${appointmentId}`,
         {
           credentials: "include",
         }
@@ -147,8 +148,8 @@ const User_Deshbord = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/user/add-feedback/692c1d22bad16b5a0d46d074",
+      const res = await apiFetch(
+        API_URL + '/user/add-feedback/692c1d22bad16b5a0d46d074',
         {
           method: "POST",
 
@@ -186,8 +187,8 @@ const User_Deshbord = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/user/logout",
+      const res = await apiFetch(
+        API_URL + '/user/logout',
         {
           method: "GET",
           credentials: "include",
@@ -459,7 +460,7 @@ const User_Deshbord = () => {
                 <img
                   src={
                     doctor.image
-                      ? `http://localhost:8000/${doctor.image.replace(/\\/g, "/")}`
+                      ? `${API_URL}/${doctor.image.replace(/\\/g, "/")}`
                       : "https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small/user-profile-icon-free-vector.jpg"
                   }
                   className="w-40 h-40 p-2 m-2 border-4 border-blue-200 rounded-full justify-self-center object-cover"

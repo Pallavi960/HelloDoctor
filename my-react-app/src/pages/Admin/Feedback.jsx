@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import AdminSidebar from "./AdminSidebar";
 
@@ -12,7 +13,7 @@ const Feedback = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:8000/admin/get-feedback", {
+      const res = await apiFetch(API_URL + '/admin/get-feedback', {
         credentials: "include",
       });
 
@@ -30,8 +31,8 @@ const Feedback = () => {
       const enriched = await Promise.all(
         data.data.map(async (item) => {
           try {
-            const userRes = await fetch(
-              `http://localhost:8000/admin/getUserById/${item.userId}`,
+            const userRes = await apiFetch(
+              `${API_URL}/admin/getUserById/${item.userId}`,
               { credentials: "include" }
             );
 

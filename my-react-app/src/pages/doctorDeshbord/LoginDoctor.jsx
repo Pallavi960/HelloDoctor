@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/Hello_Doctor_logo.png";
@@ -13,7 +14,7 @@ const LoginDoctor = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/doctor/login", {
+      const res = await apiFetch(API_URL + '/doctor/login', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

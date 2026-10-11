@@ -370,7 +370,7 @@ async function findPendingAppointments(req, res) {
 
             message: "Something went wrong!",
 
-            error: error
+            error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error
 
         });
 
@@ -417,7 +417,7 @@ async function findApprovedAppointments(req, res) {
 
             message: "Something went wrong!",
 
-            error: error
+            error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error
 
         });
 
@@ -666,7 +666,7 @@ async function deleteAppointment(req, res) {
 
             message: "Something went wrong!",
 
-            error: error
+            error: process.env.NODE_ENV === "production" ? "Something went wrong!" : error
 
         });
 

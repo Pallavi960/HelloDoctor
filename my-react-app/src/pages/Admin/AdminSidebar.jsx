@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -19,8 +20,8 @@ const AdminSidebar = ({ active }) => {
 
   async function handleLogout() {
     try {
-      const res = await fetch(
-        "http://localhost:8000/admin/logout",
+      const res = await apiFetch(
+        API_URL + '/admin/logout',
         {
           method: "GET",
           credentials: "include",

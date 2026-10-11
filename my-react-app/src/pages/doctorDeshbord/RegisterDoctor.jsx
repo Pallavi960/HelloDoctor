@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom';
@@ -41,7 +42,7 @@ function RegisterDoctor() {
         formData.append("image", image);  // added
         formData.append("cv", cv);         // added
 
-        fetch("http://localhost:8000/doctor/register", {
+        apiFetch(API_URL + '/doctor/register', {
             method: "POST",
             // no Content-Type header — browser sets it automatically for FormData
             body: formData,

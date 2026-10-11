@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -24,8 +25,8 @@ const Notification = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/doctor/logout",
+      const res = await apiFetch(
+        API_URL + '/doctor/logout',
         {
           method: "GET",
           credentials: "include",
@@ -53,8 +54,8 @@ const Notification = () => {
 
     try {
 
-      const res = await fetch(
-        `http://localhost:8000/appointment/accept/${id}`,
+      const res = await apiFetch(
+        `${API_URL}/appointment/accept/${id}`,
         {
           method: "PUT",
           credentials: "include",
@@ -85,8 +86,8 @@ const Notification = () => {
 
     try {
 
-      const res = await fetch(
-        `http://localhost:8000/appointment/reject/${id}`,
+      const res = await apiFetch(
+        `${API_URL}/appointment/reject/${id}`,
         {
           method: "PUT",
           credentials: "include",
@@ -117,8 +118,8 @@ const Notification = () => {
 
     try {
 
-      const res = await fetch(
-        "http://localhost:8000/doctor/notificationDoctor",
+      const res = await apiFetch(
+        API_URL + '/doctor/notificationDoctor',
         {
           method: "GET",
           credentials: "include",
@@ -144,8 +145,8 @@ const Notification = () => {
 
               const appointId = item.appointmentId;
 
-              const appointRes = await fetch(
-                `http://localhost:8000/appointment/getAppointmentByid/${appointId}`,
+              const appointRes = await apiFetch(
+                `${API_URL}/appointment/getAppointmentByid/${appointId}`,
                 {
                   credentials: "include",
                 }

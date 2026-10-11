@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/Hello_Doctor_logo.png";
@@ -15,7 +16,7 @@ const Myappointment = () => {
     try {
       setLoading(true);
 
-      const data = await fetch("http://localhost:8000/user/user-appointment", {
+      const data = await apiFetch(API_URL + '/user/user-appointment', {
         method: "GET",
         credentials: "include",
       });
@@ -39,8 +40,8 @@ const Myappointment = () => {
           try {
             console.log("doctor id is:", item.doctorId);
 
-            const doctorData = await fetch(
-              `http://localhost:8000/user/getDoctorByid/${item.doctorId}`,
+            const doctorData = await apiFetch(
+              `${API_URL}/user/getDoctorByid/${item.doctorId}`,
               { method: "GET", credentials: "include" }
             );
 
@@ -72,7 +73,7 @@ const Myappointment = () => {
 
   async function handleLogout() {
     try {
-      const res = await fetch("http://localhost:8000/user/logout", {
+      const res = await apiFetch(API_URL + '/user/logout', {
         method: "GET",
         credentials: "include",
       });

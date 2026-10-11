@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
@@ -26,8 +27,8 @@ const UserMyProfile = () => {
 
       setLoading(true);
 
-      const response = await fetch(
-        "http://localhost:8000/user/myprofile",
+      const response = await apiFetch(
+        API_URL + '/user/myprofile',
         {
           method: "GET",
           credentials: "include",
@@ -88,8 +89,8 @@ const UserMyProfile = () => {
 
     try {
 
-      const response = await fetch(
-        "http://localhost:8000/user/update-user-profile",
+      const response = await apiFetch(
+        API_URL + '/user/update-user-profile',
         {
           method: "PUT",
 

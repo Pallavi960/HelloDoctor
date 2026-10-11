@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaBell, FaUserCircle } from "react-icons/fa";
@@ -17,8 +18,8 @@ const Notification_user = () => {
 
       setLoading(true);
 
-      const res = await fetch(
-        "http://localhost:8000/user/notificationUser",
+      const res = await apiFetch(
+        API_URL + '/user/notificationUser',
         {
           credentials: "include",
         }
@@ -57,8 +58,8 @@ const Notification_user = () => {
   }
 async function handleLogout() {
     try {
-      const res = await fetch(
-        "http://localhost:8000/user/logout",
+      const res = await apiFetch(
+        API_URL + '/user/logout',
         { method: "GET", credentials: "include" }
       );
       const data = await res.json();

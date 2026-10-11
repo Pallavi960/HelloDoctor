@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Trash2 } from "lucide-react";
@@ -13,7 +14,7 @@ const Allusers = () => {
 
   async function collectUsers() {
     try {
-      const data = await fetch("http://localhost:8000/admin/getAllusers", {
+      const data = await apiFetch(API_URL + '/admin/getAllusers', {
         credentials: "include",
       });
 
@@ -45,8 +46,8 @@ const Allusers = () => {
       setDeleteLoadingId(id);
 
       // STEP 1 — GET ALL APPOINTMENTS
-      const apptRes = await fetch(
-        "http://localhost:8000/admin/getAllappointments",
+      const apptRes = await apiFetch(
+        API_URL + '/admin/getAllappointments',
         { credentials: "include" }
       );
 
@@ -71,8 +72,8 @@ const Allusers = () => {
       await Promise.all(
         toReject.map(async (a) => {
           try {
-            await fetch(
-              `http://localhost:8000/admin/reject/${a._id}`,
+            await apiFetch(
+              `${API_URL}/admin/reject/${a._id}`,
               {
                 method: "POST",
                 credentials: "include",
@@ -86,8 +87,8 @@ const Allusers = () => {
       );
 
       // STEP 4 — DELETE THE USER
-      const res = await fetch(
-        `http://localhost:8000/admin/deleteUser/${id}`,
+      const res = await apiFetch(
+        `${API_URL}/admin/deleteUser/${id}`,
         {
           method: "DELETE",
           credentials: "include",

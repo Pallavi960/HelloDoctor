@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -13,7 +14,7 @@ const LoginUser = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/admin/login", {
+      const res = await apiFetch(API_URL + '/admin/login', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -15,11 +16,11 @@ const Book = () => {
   const [loadingSlots, setLoadingSlots] = useState(true);
 
   function getImageUrl(imagePath) {
-    return "http://localhost:8000/" + imagePath.replace(/\\/g, "/");
+    return API_URL + '/' + imagePath.replace(/\\/g, "/");
   }
 
   async function fetchDoctor() {
-    const res = await fetch(`http://localhost:8000/doctor/getDoctorByid/${id}`, {
+    const res = await apiFetch(`${API_URL}/doctor/getDoctorByid/${id}`, {
       credentials: "include",
     });
     const data = await res.json();
@@ -31,7 +32,7 @@ const Book = () => {
   async function fetchSlots() {
     try {
       setLoadingSlots(true);
-      const res = await fetch(`http://localhost:8000/user/getDoctorSlots/${id}`, {
+      const res = await apiFetch(`${API_URL}/user/getDoctorSlots/${id}`, {
         credentials: "include",
       });
       const result = await res.json();
@@ -63,7 +64,7 @@ const Book = () => {
       age,
     };
 
-    const res = await fetch("http://localhost:8000/appointment/Book", {
+    const res = await apiFetch(API_URL + '/appointment/Book', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import AdminSidebar from "./AdminSidebar";
 
@@ -14,16 +15,16 @@ const Allappointment = () => {
       let url = "";
 
       if (type === "pending") {
-        url = "http://localhost:8000/admin/findPendingAppointments";
+        url = API_URL + '/admin/findPendingAppointments';
       } else if (type === "approved") {
-        url = "http://localhost:8000/admin/findApprovedAppointments";
+        url = API_URL + '/admin/findApprovedAppointments';
       } else if (type === "rejected") {
-        url = "http://localhost:8000/admin/findrejectAppointments";
+        url = API_URL + '/admin/findrejectAppointments';
       } else if (type === "completed") {
-        url = "http://localhost:8000/admin/completed-appointment";
+        url = API_URL + '/admin/completed-appointment';
       }
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         credentials: "include",
       });
 
@@ -40,8 +41,8 @@ const Allappointment = () => {
           let doctorName = "Doctor";
 
           try {
-            const docRes = await fetch(
-              `http://localhost:8000/admin/getDoctorByid/${item.doctorId}`,
+            const docRes = await apiFetch(
+              `${API_URL}/admin/getDoctorByid/${item.doctorId}`,
               { credentials: "include" }
             );
 
@@ -79,23 +80,23 @@ const Allappointment = () => {
       let method = "POST";
 
       if (action === "approve") {
-        url = `http://localhost:8000/admin/accept/${id}`;
+        url = `${API_URL}/admin/accept/${id}`;
       }
 
       if (action === "reject") {
-        url = `http://localhost:8000/admin/reject/${id}`;
+        url = `${API_URL}/admin/reject/${id}`;
       }
 
       if (action === "complete") {
-        url = `http://localhost:8000/admin/complete/${id}`;
+        url = `${API_URL}/admin/complete/${id}`;
       }
 
       if (action === "delete") {
-        url = `http://localhost:8000/admin/delete/${id}`;
+        url = `${API_URL}/admin/delete/${id}`;
         method = "DELETE";
       }
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         credentials: "include",
         headers: { "Content-Type": "application/json" },

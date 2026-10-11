@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 
@@ -20,7 +21,7 @@ function Registeruser() {
   function Collectdata(e) {
     e.preventDefault();
     const userData = { name, email, password };
-    fetch("http://localhost:8000/user/register", {
+    apiFetch(API_URL + '/user/register', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),

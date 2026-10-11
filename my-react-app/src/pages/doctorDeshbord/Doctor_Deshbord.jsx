@@ -1,3 +1,4 @@
+import { API_URL, apiFetch } from "../../config/api.js";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
@@ -44,7 +45,7 @@ const Doctor_Dashboard = () => {
   // ================= CHECK ACCESS =================
   async function checkAccess() {
     try {
-      const info = await fetch(`http://localhost:8000/doctor/check`, {
+      const info = await apiFetch(`${API_URL}/doctor/check`, {
         method: "GET",
         credentials: "include",
       });
@@ -69,7 +70,7 @@ const Doctor_Dashboard = () => {
   // ================= LOGOUT =================
   async function handleLogout() {
     try {
-      const info = await fetch("http://localhost:8000/doctor/logout", {
+      const info = await apiFetch(API_URL + '/doctor/logout', {
         method: "GET",
         credentials: "include",
       });
@@ -85,7 +86,7 @@ const Doctor_Dashboard = () => {
   // ================= PENDING COUNT =================
   async function handlePendingCount() {
     try {
-      const info = await fetch(`http://localhost:8000/doctor/count-pending`, {
+      const info = await apiFetch(`${API_URL}/doctor/count-pending`, {
         credentials: "include",
       });
       const data = await info.json();
@@ -98,7 +99,7 @@ const Doctor_Dashboard = () => {
   // ================= COMPLETE COUNT =================
   async function handleCompleteCount() {
     try {
-      const info = await fetch(`http://localhost:8000/doctor/count-complete`, {
+      const info = await apiFetch(`${API_URL}/doctor/count-complete`, {
         credentials: "include",
       });
       const data = await info.json();
@@ -111,8 +112,8 @@ const Doctor_Dashboard = () => {
   // ================= APPROVED APPOINTMENTS =================
   async function approvedAppointments() {
     try {
-      const info = await fetch(
-        `http://localhost:8000/doctor/doctorsApprovedAppointments`,
+      const info = await apiFetch(
+        `${API_URL}/doctor/doctorsApprovedAppointments`,
         { credentials: "include" }
       );
       const appointmentdata = await info.json();
@@ -132,8 +133,8 @@ const Doctor_Dashboard = () => {
   // ================= COMPLETE APPOINTMENT =================
   async function handleCompleteAppointment(id) {
     try {
-      const info = await fetch(
-        `http://localhost:8000/doctor/complete/${id}`,
+      const info = await apiFetch(
+        `${API_URL}/doctor/complete/${id}`,
         {
           method: "PUT",
           credentials: "include",
